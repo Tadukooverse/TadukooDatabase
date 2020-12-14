@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.tadukoo.database</groupId>
 		<artifactId>TadukooDatabaseParent</artifactId>
-		<version>0.2.2-Alpha-SNAPSHOT</version>
+		<version>0.2.2-Alpha</version>
 	</parent>
 	<artifactId>TadukooMySQL</artifactId>
 	<dependencies>
