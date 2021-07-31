@@ -12,11 +12,11 @@
 		<!-- Tadukoo Util Dependencies -->
 		<dependency>
 			<groupId>${tadukoo.util.groupID}</groupId>
-			<artifactId>${tadukoo.util.lang.artifactID}</artifactId>
+			<artifactId>${tadukoo.util.functions.artifactID}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${tadukoo.util.groupID}</groupId>
-			<artifactId>${tadukoo.util.functions.artifactID}</artifactId>
+			<artifactId>${tadukoo.util.util.artifactID}</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
