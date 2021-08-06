@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.tadukoo.database</groupId>
 		<artifactId>TadukooDatabaseParent</artifactId>
-		<version>0.2.3-Alpha-SNAPSHOT</version>
+		<version>0.3-Alpha-SNAPSHOT</version>
 	</parent>
 	<artifactId>TadukooMySQL</artifactId>
 	<dependencies>
@@ -18,8 +18,28 @@
 			<groupId>${tadukoo.util.groupID}</groupId>
 			<artifactId>${tadukoo.util.util.artifactID}</artifactId>
 		</dependency>
+		<!-- MySQL Connector -->
+		<dependency>
+			<groupId>${mariadb.groupID}</groupId>
+			<artifactId>${mariadb.java.artifactID}</artifactId>
+		</dependency>
+		<!-- JUnit Dependencies -->
+		<dependency>
+			<groupId>${junit.jupiter.groupID}</groupId>
+			<artifactId>${junit.jupiter.artifactID}</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${junit.platform.groupID}</groupId>
+			<artifactId>${junit.platform.artifactID}</artifactId>
+		</dependency>
+		<!-- Tadukoo JUnit -->
+		<dependency>
+			<groupId>${tadukoo.junit.groupID}</groupId>
+			<artifactId>${tadukoo.junit.junit.artifactID}</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>${directory.source}</sourceDirectory>
+		<testSourceDirectory>${directory.test}</testSourceDirectory>
 	</build>
 </project>

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.tadukoo.database</groupId>
 	<artifactId>TadukooDatabaseParent</artifactId>
-	<version>0.2.3-Alpha-SNAPSHOT</version>
+	<version>0.3-Alpha-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<description>Utilities to make working with databases easier</description>
 	<modules>
@@ -20,5 +20,23 @@
 		<!-- Info -->
 		<shortName>TadukooDatabase</shortName>
 		<tadukoo.util.version>0.5-Beta</tadukoo.util.version>
+		
+		<!-- MariaDB Versions -->
+		<mariadb.version>2.7.3</mariadb.version>
+		<mariadb.java.version>${mariadb.version}</mariadb.java.version>
+		
+		<!-- MariaDB Info -->
+		<mariadb.groupID>org.mariadb.jdbc</mariadb.groupID>
+		<mariadb.java.artifactID>mariadb-java-client</mariadb.java.artifactID>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<!-- MySQL Connector -->
+			<dependency>
+				<groupId>${mariadb.groupID}</groupId>
+				<artifactId>${mariadb.java.artifactID}</artifactId>
+				<version>${mariadb.java.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
