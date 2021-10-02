@@ -1,5 +1,6 @@
 package com.github.tadukoo.database.mysql.syntax.conditional;
 
+import com.github.tadukoo.database.mysql.syntax.SQLSyntaxUtil;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
 import com.github.tadukoo.util.StringUtil;
 
@@ -208,27 +209,10 @@ public class ConditionalStatement{
 		return value;
 	}
 	
-	/**
-	 * Converts the given object into a string to use for a value in MySQL
-	 *
-	 * @param value The object to convert
-	 * @return The string representing the given value
-	 */
-	private String convertValueToString(Object value){
-		if(value instanceof String s){
-			return "'" + s + "'";
-		}else if(value instanceof Integer i){
-			return i.toString();
-		}else if(value instanceof Boolean b){
-			return b.toString();
-		}else{
-			return value.toString();
-		}
-	}
-	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
-		return (negated?"NOT ":"") + column.toString() + " " + operator.toString() + " " + convertValueToString(value);
+		return (negated?"NOT ":"") + column.toString() + " " + operator.toString() + " " +
+				SQLSyntaxUtil.convertValueToString(value);
 	}
 }
