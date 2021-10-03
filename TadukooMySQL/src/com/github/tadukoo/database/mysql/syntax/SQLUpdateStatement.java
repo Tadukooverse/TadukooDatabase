@@ -49,22 +49,19 @@ public class SQLUpdateStatement{
 	 */
 	public static class SQLUpdateStatementBuilder{
 		/** The {@link TableRef table} to update */
-		private TableRef table = null;
+		private final TableRef table;
 		/** The {@link EqualsStatement statements} to set values */
 		private List<EqualsStatement> setStatements = new ArrayList<>();
 		/** The {@link Conditional where statement} */
 		private Conditional whereStatement = null;
 		
-		/** Not allowed to instantiate outside SQLUpdateStatement */
-		private SQLUpdateStatementBuilder(){ }
-		
 		/**
+		 * Not allowed to instantiate outside SQLUpdateStatement
+		 *
 		 * @param table The {@link TableRef table} to update
-		 * @return this, to continue building
 		 */
-		public SQLUpdateStatementBuilder table(TableRef table){
+		private SQLUpdateStatementBuilder(TableRef table){
 			this.table = table;
-			return this;
 		}
 		
 		/**
@@ -151,10 +148,11 @@ public class SQLUpdateStatement{
 	}
 	
 	/**
+	 * @param table The {@link TableRef table} to update
 	 * @return A new {@link SQLUpdateStatementBuilder builder} to use to build a {@link SQLUpdateStatement}
 	 */
-	public static SQLUpdateStatementBuilder builder(){
-		return new SQLUpdateStatementBuilder();
+	public static SQLUpdateStatementBuilder builder(TableRef table){
+		return new SQLUpdateStatementBuilder(table);
 	}
 	
 	/**

@@ -21,8 +21,8 @@ public class SQLInsertStatementTest{
 	public void setup(){
 		table = TableRef.builder().tableName("Test").build();
 		value = 42;
-		stmt = SQLInsertStatement.builder()
-				.table(table).value(value)
+		stmt = SQLInsertStatement.builder(table)
+				.value(value)
 				.build();
 	}
 	
@@ -46,8 +46,8 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderSetColumn(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
-		stmt = SQLInsertStatement.builder()
-				.table(table).column(column).value(value)
+		stmt = SQLInsertStatement.builder(table)
+				.column(column).value(value)
 				.build();
 		List<ColumnRef> columns = stmt.getColumns();
 		assertEquals(1, columns.size());
@@ -61,8 +61,8 @@ public class SQLInsertStatementTest{
 				ColumnRef.builder().columnName("Derp2").build()
 		);
 		List<Object> values = ListUtil.createList(value, "test");
-		stmt = SQLInsertStatement.builder()
-				.table(table).columns(columns).values(values)
+		stmt = SQLInsertStatement.builder(table)
+				.columns(columns).values(values)
 				.build();
 		assertEquals(columns, stmt.getColumns());
 		assertEquals(values, stmt.getValues());
@@ -71,7 +71,7 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderMissingTable(){
 		try{
-			stmt = SQLInsertStatement.builder()
+			stmt = SQLInsertStatement.builder(null)
 					.value(value)
 					.build();
 			fail();
@@ -84,8 +84,7 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderMissingValues(){
 		try{
-			stmt = SQLInsertStatement.builder()
-					.table(table)
+			stmt = SQLInsertStatement.builder(table)
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -97,8 +96,8 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderColumnsAndValuesSizeMismatch(){
 		try{
-			stmt = SQLInsertStatement.builder()
-					.table(table).column(ColumnRef.builder().columnName("Derp").build())
+			stmt = SQLInsertStatement.builder(table)
+					.column(ColumnRef.builder().columnName("Derp").build())
 					.column(ColumnRef.builder().columnName("Derp2").build()).value(value)
 					.build();
 			fail();
@@ -111,7 +110,7 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderAllErrors(){
 		try{
-			stmt = SQLInsertStatement.builder()
+			stmt = SQLInsertStatement.builder(null)
 					.column(ColumnRef.builder().columnName("Derp").build())
 					.build();
 			fail();
@@ -132,8 +131,8 @@ public class SQLInsertStatementTest{
 	
 	@Test
 	public void testToStringMultipleValues(){
-		stmt = SQLInsertStatement.builder()
-				.table(table).value(value).value(true)
+		stmt = SQLInsertStatement.builder(table)
+				.value(value).value(true)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " VALUES (" +
 				SQLSyntaxUtil.convertValueToString(value) + ", " + SQLSyntaxUtil.convertValueToString(true) + ")",
@@ -143,8 +142,8 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testToStringWithColumn(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
-		stmt = SQLInsertStatement.builder()
-				.table(table).column(column).value(value)
+		stmt = SQLInsertStatement.builder(table)
+				.column(column).value(value)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " (" + column.toString() + ") VALUES (" +
 				SQLSyntaxUtil.convertValueToString(value) + ")", stmt.toString());
@@ -154,8 +153,8 @@ public class SQLInsertStatementTest{
 	public void testToStringWithEverything(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
 		ColumnRef column2 = ColumnRef.builder().columnName("Derp2").build();
-		stmt = SQLInsertStatement.builder()
-				.table(table).column(column).column(column2).value(value).value(true)
+		stmt = SQLInsertStatement.builder(table)
+				.column(column).column(column2).value(value).value(true)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " (" + column.toString() + ", " + column2.toString() +
 				") VALUES (" + SQLSyntaxUtil.convertValueToString(value) + ", " +

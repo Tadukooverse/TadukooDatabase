@@ -48,22 +48,19 @@ public class SQLInsertStatement{
 	 */
 	public static class SQLInsertStatementBuilder{
 		/** The {@link TableRef table} to insert into */
-		private TableRef table = null;
+		private final TableRef table;
 		/** The {@link ColumnRef columns} to insert into */
 		private List<ColumnRef> columns = new ArrayList<>();
 		/** The values to insert */
 		private List<Object> values = new ArrayList<>();
 		
-		/** Not allowed to instantiate outside SQLInsertStatement */
-		private SQLInsertStatementBuilder(){ }
-		
 		/**
+		 * Not allowed to instantiate outside SQLInsertStatement
+		 *
 		 * @param table The {@link TableRef table} to insert into
-		 * @return this, to continue building
 		 */
-		public SQLInsertStatementBuilder table(TableRef table){
+		private SQLInsertStatementBuilder(TableRef table){
 			this.table = table;
-			return this;
 		}
 		
 		/**
@@ -163,10 +160,11 @@ public class SQLInsertStatement{
 	}
 	
 	/**
+	 * @param table The {@link TableRef table} to insert into
 	 * @return A {@link SQLInsertStatementBuilder builder} to use to make a {@link SQLInsertStatement}
 	 */
-	public static SQLInsertStatementBuilder builder(){
-		return new SQLInsertStatementBuilder();
+	public static SQLInsertStatementBuilder builder(TableRef table){
+		return new SQLInsertStatementBuilder(table);
 	}
 	
 	/**

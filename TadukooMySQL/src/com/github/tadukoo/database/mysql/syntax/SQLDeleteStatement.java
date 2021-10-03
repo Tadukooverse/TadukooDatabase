@@ -111,6 +111,7 @@ public class SQLDeleteStatement{
 	}
 	
 	/**
+	 * @param table The {@link TableRef table} to delete from
 	 * @return A new {@link SQLDeleteStatementBuilder builder} to build a {@link SQLDeleteStatement}
 	 */
 	public static SQLDeleteStatementBuilder builder(TableRef table){
