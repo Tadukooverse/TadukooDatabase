@@ -58,7 +58,7 @@ public class Conditional{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class ConditionalBuilder{
+	public static class ConditionalBuilder implements FirstCondition, OperatorOrBuild, SecondCondition{
 		/** The first {@link Conditional} involved (it may be null if a {@link ConditionalStatement} is used instead) */
 		private Conditional firstCond;
 		/** The first {@link ConditionalStatement} involved (it may be null if a {@link Conditional} is used instead) */
@@ -75,52 +75,32 @@ public class Conditional{
 		/** Not allowed to instantiate outside Conditional */
 		private ConditionalBuilder(){ }
 		
-		/**
-		 * @param firstCond The first {@link Conditional} involved (it may be null if a {@link ConditionalStatement}
-		 *                  is used instead)
-		 * @return this, to continue building
-		 */
-		public ConditionalBuilder firstCond(Conditional firstCond){
+		/** {@inheritDoc} */
+		public Operator firstCond(Conditional firstCond){
 			this.firstCond = firstCond;
 			return this;
 		}
 		
-		/**
-		 * @param firstCondStmt The first {@link ConditionalStatement} involved (it may be null if a {@link Conditional}
-		 *                      is used instead)
-		 * @return this, to continue building
-		 */
-		public ConditionalBuilder firstCondStmt(ConditionalStatement firstCondStmt){
+		/** {@inheritDoc} */
+		public OperatorOrBuild firstCondStmt(ConditionalStatement firstCondStmt){
 			this.firstCondStmt = firstCondStmt;
 			return this;
 		}
 		
-		/**
-		 * @param operator The {@link SQLConjunctiveOperator operator} for the conditional (it may be null if we have
-		 *                 just one condition)
-		 * @return this, to continue building
-		 */
-		public ConditionalBuilder operator(SQLConjunctiveOperator operator){
+		/** {@inheritDoc} */
+		public SecondCondition operator(SQLConjunctiveOperator operator){
 			this.operator = operator;
 			return this;
 		}
 		
-		/**
-		 * @param secondCond The second {@link Conditional} involved (it may be null if either a
-		 *                   {@link ConditionalStatement} is used instead or if there's only one condition)
-		 * @return this, to continue building
-		 */
-		public ConditionalBuilder secondCond(Conditional secondCond){
+		/** {@inheritDoc} */
+		public Build secondCond(Conditional secondCond){
 			this.secondCond = secondCond;
 			return this;
 		}
 		
-		/**
-		 * @param secondCondStmt The second {@link ConditionalStatement} involved (it may be null if either a
-		 *                       {@link Conditional} is used instead or if there's only one condition)
-		 * @return this, to continue building
-		 */
-		public ConditionalBuilder secondCondStmt(ConditionalStatement secondCondStmt){
+		/** {@inheritDoc} */
+		public Build secondCondStmt(ConditionalStatement secondCondStmt){
 			this.secondCondStmt = secondCondStmt;
 			return this;
 		}
@@ -134,16 +114,6 @@ public class Conditional{
 			// Must specify either firstCond or firstCondStmt
 			if(firstCond == null && firstCondStmt == null){
 				errors.add("Must specify either firstCond or firstCondStmt!");
-			}
-			
-			// Can't specify both firstCond and firstCondStmt
-			if(firstCond != null && firstCondStmt != null){
-				errors.add("Can't specify both firstCond and firstCondStmt!");
-			}
-			
-			// Can't specify both secondCond and secondCondStmt
-			if(secondCond != null && secondCondStmt != null){
-				errors.add("Can't specify both secondCond and secondCondStmt!");
 			}
 			
 			// Can't specify a single conditional by itself
@@ -168,11 +138,7 @@ public class Conditional{
 			}
 		}
 		
-		/**
-		 * Constructs a new {@link Conditional} with the set parameters after checking for errors
-		 *
-		 * @return The newly built {@link Conditional}
-		 */
+		/** {@inheritDoc} */
 		public Conditional build(){
 			checkForErrors();
 			
@@ -215,7 +181,7 @@ public class Conditional{
 	/**
 	 * @return A new {@link ConditionalBuilder builder} to use to build a {@link Conditional}
 	 */
-	public static ConditionalBuilder builder(){
+	public static FirstCondition builder(){
 		return new ConditionalBuilder();
 	}
 	
@@ -294,5 +260,78 @@ public class Conditional{
 		
 		// Return the string we built
 		return conditional.toString();
+	}
+	
+	/*
+	 * Interfaces for Builder
+	 */
+	
+	/**
+	 * The First Condition part of building a {@link Conditional}
+	 */
+	public interface FirstCondition{
+		/**
+		 * @param firstCond The first {@link Conditional} involved (it may be null if a {@link ConditionalStatement}
+		 *                  is used instead)
+		 * @return this, to continue building
+		 */
+		Operator firstCond(Conditional firstCond);
+		
+		/**
+		 * @param firstCondStmt The first {@link ConditionalStatement} involved (it may be null if a {@link Conditional}
+		 *                      is used instead)
+		 * @return this, to continue building
+		 */
+		OperatorOrBuild firstCondStmt(ConditionalStatement firstCondStmt);
+	}
+	
+	/**
+	 * The {@link SQLConjunctiveOperator Operator} part of building a {@link Conditional}
+	 */
+	public interface Operator{
+		/**
+		 * @param operator The {@link SQLConjunctiveOperator operator} for the conditional (it may be null if we have
+		 *                 just one condition)
+		 * @return this, to continue building
+		 */
+		SecondCondition operator(SQLConjunctiveOperator operator);
+	}
+	
+	/**
+	 * The {@link SQLConjunctiveOperator Operator} or building part of building a {@link Conditional}
+	 */
+	public interface OperatorOrBuild extends Operator, Build{
+	
+	}
+	
+	/**
+	 * The Second Condition part of building a {@link Conditional}
+	 */
+	public interface SecondCondition{
+		/**
+		 * @param secondCond The second {@link Conditional} involved (it may be null if either a
+		 *                   {@link ConditionalStatement} is used instead or if there's only one condition)
+		 * @return this, to continue building
+		 */
+		Build secondCond(Conditional secondCond);
+		
+		/**
+		 * @param secondCondStmt The second {@link ConditionalStatement} involved (it may be null if either a
+		 *                       {@link Conditional} is used instead or if there's only one condition)
+		 * @return this, to continue building
+		 */
+		Build secondCondStmt(ConditionalStatement secondCondStmt);
+	}
+	
+	/**
+	 * The Building part of building a {@link Conditional}
+	 */
+	public interface Build{
+		/**
+		 * Constructs a new {@link Conditional} with the set parameters after checking for errors
+		 *
+		 * @return The newly built {@link Conditional}
+		 */
+		Conditional build();
 	}
 }

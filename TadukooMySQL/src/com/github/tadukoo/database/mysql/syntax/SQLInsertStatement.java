@@ -39,63 +39,66 @@ public class SQLInsertStatement{
 	 *     <tr>
 	 *         <td>values</td>
 	 *         <td>The values to insert</td>
-	 *         <td>Required</td>
+	 *         <td>Defaults to empty list - need either this or select statement</td>
+	 *     </tr>
+	 *     <tr>
+	 *         <td>selectStmt</td>
+	 *         <td>The {@link SQLSelectStatement select statement} to use for values to insert</td>
+	 *         <td>Defaults to null - need either this or values</td>
 	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLInsertStatementBuilder{
+	public static class SQLInsertStatementBuilder implements Table, ColumnsAndValuesOrSelectStatement, Build{
 		/** The {@link TableRef table} to insert into */
-		private final TableRef table;
+		private TableRef table;
 		/** The {@link ColumnRef columns} to insert into */
 		private List<ColumnRef> columns = new ArrayList<>();
 		/** The values to insert */
 		private List<Object> values = new ArrayList<>();
+		/** The {@link SQLSelectStatement select statement} to use for values to insert */
+		private SQLSelectStatement selectStmt = null;
 		
 		/**
 		 * Not allowed to instantiate outside SQLInsertStatement
-		 *
-		 * @param table The {@link TableRef table} to insert into
 		 */
-		private SQLInsertStatementBuilder(TableRef table){
+		private SQLInsertStatementBuilder(){ }
+		
+		/** {@inheritDoc} */
+		public ColumnsAndValuesOrSelectStatement table(TableRef table){
 			this.table = table;
+			return this;
 		}
 		
-		/**
-		 * @param columns The {@link ColumnRef columns} to insert into
-		 * @return this, to continue building
-		 */
-		public SQLInsertStatementBuilder columns(List<ColumnRef> columns){
+		/** {@inheritDoc} */
+		public ColumnsAndValuesOrSelectStatement columns(List<ColumnRef> columns){
 			this.columns = columns;
 			return this;
 		}
 		
-		/**
-		 * @param column A {@link ColumnRef column} to insert into (added to the list)
-		 * @return this, to continue building
-		 */
-		public SQLInsertStatementBuilder column(ColumnRef column){
-			columns.add(column);
+		/** {@inheritDoc} */
+		public ColumnsAndValuesOrSelectStatement columns(ColumnRef ... columns){
+			this.columns = ListUtil.createList(columns);
 			return this;
 		}
 		
-		/**
-		 * @param values The values to insert
-		 * @return this, to continue building
-		 */
-		public SQLInsertStatementBuilder values(List<Object> values){
+		/** {@inheritDoc} */
+		public Build values(List<Object> values){
 			this.values = values;
 			return this;
 		}
 		
-		/**
-		 * @param value A value to insert (added to the list)
-		 * @return this, to continue building
-		 */
-		public SQLInsertStatementBuilder value(Object value){
-			values.add(value);
+		/** {@inheritDoc} */
+		public Build values(Object ... values){
+			this.values = ListUtil.createList(values);
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		public Build selectStmt(SQLSelectStatement selectStmt){
+			this.selectStmt = selectStmt;
 			return this;
 		}
 		
@@ -110,13 +113,13 @@ public class SQLInsertStatement{
 				errors.add("table is required!");
 			}
 			
-			// values can't be empty
-			if(ListUtil.isBlank(values)){
-				errors.add("values can't be empty!");
+			// Need either values or select statement
+			if(ListUtil.isBlank(values) && selectStmt == null){
+				errors.add("Must specify either values or selectStmt!");
 			}
 			
-			// if columns isn't empty, it must match the number of values
-			if(ListUtil.isNotBlank(columns) && columns.size() != values.size()){
+			// if columns and values aren't empty, it must match the number of values
+			if(ListUtil.isNotBlank(columns) && ListUtil.isNotBlank(values) && columns.size() != values.size()){
 				errors.add("Number of columns must equal number of values if specified!");
 			}
 			
@@ -127,15 +130,11 @@ public class SQLInsertStatement{
 			}
 		}
 		
-		/**
-		 * Creates a new {@link SQLInsertStatement} after checking for errors
-		 *
-		 * @return The newly built {@link SQLInsertStatement}
-		 */
+		/** {@inheritDoc} */
 		public SQLInsertStatement build(){
 			checkForErrors();
 			
-			return new SQLInsertStatement(table, columns, values);
+			return new SQLInsertStatement(table, columns, values, selectStmt);
 		}
 	}
 	
@@ -145,6 +144,8 @@ public class SQLInsertStatement{
 	private final List<ColumnRef> columns;
 	/** The values to insert */
 	private final List<Object> values;
+	/** The {@link SQLSelectStatement select statement} to use for values to insert */
+	private final SQLSelectStatement selectStmt;
 	
 	/**
 	 * Constructs a new SQLInsertStatement using the given parameters
@@ -152,19 +153,21 @@ public class SQLInsertStatement{
 	 * @param table The {@link TableRef table} to insert into
 	 * @param columns The {@link ColumnRef columns} to insert into
 	 * @param values The values to insert
+	 * @param selectStmt The {@link SQLSelectStatement select statement} to use for values to insert
 	 */
-	private SQLInsertStatement(TableRef table, List<ColumnRef> columns, List<Object> values){
+	private SQLInsertStatement(TableRef table, List<ColumnRef> columns, List<Object> values,
+	                           SQLSelectStatement selectStmt){
 		this.table = table;
 		this.columns = columns;
 		this.values = values;
+		this.selectStmt = selectStmt;
 	}
 	
 	/**
-	 * @param table The {@link TableRef table} to insert into
 	 * @return A {@link SQLInsertStatementBuilder builder} to use to make a {@link SQLInsertStatement}
 	 */
-	public static SQLInsertStatementBuilder builder(TableRef table){
-		return new SQLInsertStatementBuilder(table);
+	public static Table builder(){
+		return new SQLInsertStatementBuilder();
 	}
 	
 	/**
@@ -188,6 +191,13 @@ public class SQLInsertStatement{
 		return values;
 	}
 	
+	/**
+	 * @return The {@link SQLSelectStatement select statement} to use for values to insert
+	 */
+	public SQLSelectStatement getSelectStmt(){
+		return selectStmt;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
@@ -207,15 +217,82 @@ public class SQLInsertStatement{
 			statement.append(") ");
 		}
 		
-		// Add values
-		statement.append("VALUES (");
-		for(Object value: values){
-			statement.append(SQLSyntaxUtil.convertValueToString(value)).append(", ");
+		// Add select statement if we have it
+		if(selectStmt != null){
+			statement.append(selectStmt);
+		}else{
+			// Add values
+			statement.append("VALUES (");
+			for(Object value: values){
+				statement.append(SQLSyntaxUtil.convertValueToString(value)).append(", ");
+			}
+			// Remove last unnecessary comma
+			statement.delete(statement.length() - 2, statement.length());
+			statement.append(')');
 		}
-		// Remove last unnecessary comma
-		statement.delete(statement.length()-2, statement.length());
-		statement.append(')');
 		
 		return statement.toString();
+	}
+	
+	/*
+	 * Interfaces for builder
+	 */
+	
+	/**
+	 * The {@link TableRef Table} part of building a {@link SQLInsertStatement}
+	 */
+	public interface Table{
+		/**
+		 * @param table The {@link TableRef table} to insert into
+		 * @return this, to continue building
+		 */
+		ColumnsAndValuesOrSelectStatement table(TableRef table);
+	}
+	
+	/**
+	 * The {@link ColumnRef Columns} and Values part of building a {@link SQLInsertStatement}
+	 */
+	public interface ColumnsAndValuesOrSelectStatement{
+		/**
+		 * @param columns The {@link ColumnRef columns} to insert into
+		 * @return this, to continue building
+		 */
+		ColumnsAndValuesOrSelectStatement columns(List<ColumnRef> columns);
+		
+		/**
+		 * @param columns A {@link ColumnRef column} to insert into
+		 * @return this, to continue building
+		 */
+		ColumnsAndValuesOrSelectStatement columns(ColumnRef ... columns);
+		
+		/**
+		 * @param values The values to insert
+		 * @return this, to continue building
+		 */
+		Build values(List<Object> values);
+		
+		/**
+		 * @param values The values to insert
+		 * @return this, to continue building
+		 */
+		Build values(Object ... values);
+		
+		/**
+		 * @param selectStmt The {@link SQLSelectStatement select statement} to use for values to insert
+		 * @return this, to continue building
+		 */
+		Build selectStmt(SQLSelectStatement selectStmt);
+	}
+	
+	/**
+	 * The Building part of building a {@link SQLInsertStatement}
+	 */
+	public interface Build{
+		/**
+		 * Creates a new {@link SQLInsertStatement} after checking for errors
+		 *
+		 * @return The newly built {@link SQLInsertStatement}
+		 */
+		SQLInsertStatement build();
 	}
 }

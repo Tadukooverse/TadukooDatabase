@@ -35,7 +35,7 @@ public class ColumnRefTest{
 	@Test
 	public void testBuilderMissingColumnName(){
 		try{
-			columnRef = ColumnRef.builder().build();
+			columnRef = ColumnRef.builder().columnName(null).build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors trying to build a ColumnRef: \n" +

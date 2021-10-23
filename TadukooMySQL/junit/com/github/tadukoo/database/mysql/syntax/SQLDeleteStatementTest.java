@@ -19,7 +19,7 @@ public class SQLDeleteStatementTest{
 	@BeforeEach
 	public void setup(){
 		table = TableRef.builder().tableName("Test").build();
-		stmt = SQLDeleteStatement.builder(table).build();
+		stmt = SQLDeleteStatement.builder().table(table).build();
 	}
 	
 	@Test
@@ -41,14 +41,14 @@ public class SQLDeleteStatementTest{
 						.value(42)
 						.build())
 				.build();
-		stmt = SQLDeleteStatement.builder(table).whereStatement(where).build();
+		stmt = SQLDeleteStatement.builder().table(table).whereStatement(where).build();
 		assertEquals(where, stmt.getWhereStatement());
 	}
 	
 	@Test
 	public void testBuilderMissingTable(){
 		try{
-			stmt = SQLDeleteStatement.builder(null).build();
+			stmt = SQLDeleteStatement.builder().table(null).build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Errors encountered while creating SQLDeleteStatement:\ntable is required!",
@@ -70,7 +70,7 @@ public class SQLDeleteStatementTest{
 						.value(42)
 						.build())
 				.build();
-		stmt = SQLDeleteStatement.builder(table).whereStatement(where).build();
+		stmt = SQLDeleteStatement.builder().table(table).whereStatement(where).build();
 		assertEquals("DELETE FROM " + table + " WHERE " + where, stmt.toString());
 	}
 }

@@ -47,9 +47,9 @@ public class SQLUpdateStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLUpdateStatementBuilder{
+	public static class SQLUpdateStatementBuilder implements Table, SetStatements, WhereStatementAndBuild{
 		/** The {@link TableRef table} to update */
-		private final TableRef table;
+		private TableRef table;
 		/** The {@link EqualsStatement statements} to set values */
 		private List<EqualsStatement> setStatements = new ArrayList<>();
 		/** The {@link Conditional where statement} */
@@ -57,36 +57,29 @@ public class SQLUpdateStatement{
 		
 		/**
 		 * Not allowed to instantiate outside SQLUpdateStatement
-		 *
-		 * @param table The {@link TableRef table} to update
 		 */
-		private SQLUpdateStatementBuilder(TableRef table){
+		private SQLUpdateStatementBuilder(){ }
+		
+		/** {@inheritDoc} */
+		public SetStatements table(TableRef table){
 			this.table = table;
+			return this;
 		}
 		
-		/**
-		 * @param setStatements The {@link EqualsStatement statements} to set values
-		 * @return this, to continue building
-		 */
-		public SQLUpdateStatementBuilder setStatements(List<EqualsStatement> setStatements){
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild setStatements(List<EqualsStatement> setStatements){
 			this.setStatements = setStatements;
 			return this;
 		}
 		
-		/**
-		 * @param setStatement A {@link EqualsStatement statement} to set a value (added to the list)
-		 * @return this, to continue building
-		 */
-		public SQLUpdateStatementBuilder setStatement(EqualsStatement setStatement){
-			setStatements.add(setStatement);
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild setStatements(EqualsStatement ... setStatements){
+			this.setStatements = ListUtil.createList(setStatements);
 			return this;
 		}
 		
-		/**
-		 * @param whereStatement The {@link Conditional where statement}
-		 * @return this, to continue building
-		 */
-		public SQLUpdateStatementBuilder whereStatement(Conditional whereStatement){
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild whereStatement(Conditional whereStatement){
 			this.whereStatement = whereStatement;
 			return this;
 		}
@@ -114,11 +107,7 @@ public class SQLUpdateStatement{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link SQLUpdateStatement} based on the set parameters after checking for errors
-		 *
-		 * @return The newly built {@link SQLUpdateStatement}
-		 */
+		/** {@inheritDoc} */
 		public SQLUpdateStatement build(){
 			checkForErrors();
 			
@@ -148,11 +137,10 @@ public class SQLUpdateStatement{
 	}
 	
 	/**
-	 * @param table The {@link TableRef table} to update
 	 * @return A new {@link SQLUpdateStatementBuilder builder} to use to build a {@link SQLUpdateStatement}
 	 */
-	public static SQLUpdateStatementBuilder builder(TableRef table){
-		return new SQLUpdateStatementBuilder(table);
+	public static Table builder(){
+		return new SQLUpdateStatementBuilder();
 	}
 	
 	/**
@@ -198,5 +186,55 @@ public class SQLUpdateStatement{
 		}
 		
 		return statement.toString();
+	}
+	
+	/*
+	 * Interfaces used for the builder
+	 */
+	
+	/**
+	 * The {@link TableRef Table} part of building a {@link SQLUpdateStatement}
+	 */
+	public interface Table{
+		/**
+		 * @param table The {@link TableRef table} to update
+		 * @return this, to continue building
+		 */
+		SetStatements table(TableRef table);
+	}
+	
+	/**
+	 * The {@link EqualsStatement Set Statements} part of building a {@link SQLUpdateStatement}
+	 */
+	public interface SetStatements{
+		/**
+		 * @param setStatements The {@link EqualsStatement statements} to set values
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild setStatements(List<EqualsStatement> setStatements);
+		
+		/**
+		 * @param setStatements The {@link EqualsStatement statements} to set values
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild setStatements(EqualsStatement ... setStatements);
+	}
+	
+	/**
+	 * The {@link Conditional Where Statement} and building part of building a {@link SQLUpdateStatement}
+	 */
+	public interface WhereStatementAndBuild{
+		/**
+		 * @param whereStatement The {@link Conditional where statement}
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild whereStatement(Conditional whereStatement);
+		
+		/**
+		 * Builds a new {@link SQLUpdateStatement} based on the set parameters after checking for errors
+		 *
+		 * @return The newly built {@link SQLUpdateStatement}
+		 */
+		SQLUpdateStatement build();
 	}
 }

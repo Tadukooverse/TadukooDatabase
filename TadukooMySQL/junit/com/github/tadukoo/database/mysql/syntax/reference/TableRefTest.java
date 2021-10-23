@@ -35,7 +35,7 @@ public class TableRefTest{
 	@Test
 	public void testBuilderMissingTableName(){
 		try{
-			tableRef = TableRef.builder().build();
+			tableRef = TableRef.builder().tableName(null).build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("The following errors occurred trying to build a TableRef: \ntableName is required!",

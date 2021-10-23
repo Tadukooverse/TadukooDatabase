@@ -17,7 +17,9 @@ public class ConditionalStatementTest{
 	@BeforeEach
 	public void setup(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.EQUAL).value("yep")
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.EQUAL)
+				.value("yep")
 				.build();
 	}
 	
@@ -45,8 +47,10 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderSetNegated(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.EQUAL).value("yep")
 				.negated(true)
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.EQUAL)
+				.value("yep")
 				.build();
 		assertTrue(stmt.isNegated());
 	}
@@ -54,8 +58,10 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderSetNegatedNoParam(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.EQUAL).value("yep")
 				.negated()
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.EQUAL)
+				.value("yep")
 				.build();
 		assertTrue(stmt.isNegated());
 	}
@@ -63,7 +69,11 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderMissingColumn(){
 		try{
-			stmt = ConditionalStatement.builder().operator(SQLOperator.EQUAL).value("yep").build();
+			stmt = ConditionalStatement.builder()
+					.column(null)
+					.operator(SQLOperator.EQUAL)
+					.value("yep")
+					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors trying to build a ConditionalStatement:\n" +
@@ -74,8 +84,11 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderMissingOperator(){
 		try{
-			stmt = ConditionalStatement.builder().column(ColumnRef.builder().columnName(columnName).build())
-					.value("yep").build();
+			stmt = ConditionalStatement.builder()
+					.column(ColumnRef.builder().columnName(columnName).build())
+					.operator(null)
+					.value("yep")
+					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors trying to build a ConditionalStatement:\n" +
@@ -86,8 +99,11 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderMissingValue(){
 		try{
-			stmt = ConditionalStatement.builder().column(ColumnRef.builder().columnName(columnName).build())
-					.operator(SQLOperator.EQUAL).build();
+			stmt = ConditionalStatement.builder()
+					.column(ColumnRef.builder().columnName(columnName).build())
+					.operator(SQLOperator.EQUAL)
+					.value(null)
+					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors trying to build a ConditionalStatement:\n" +
@@ -98,7 +114,11 @@ public class ConditionalStatementTest{
 	@Test
 	public void testBuilderMissingEverything(){
 		try{
-			stmt = ConditionalStatement.builder().build();
+			stmt = ConditionalStatement.builder()
+					.column(null)
+					.operator(null)
+					.value(null)
+					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("""
@@ -117,7 +137,9 @@ public class ConditionalStatementTest{
 	@Test
 	public void testToStringIntValue(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.NOT_EQUAL).value(5)
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.NOT_EQUAL)
+				.value(5)
 				.build();
 		assertEquals(columnName + " != 5", stmt.toString());
 	}
@@ -125,7 +147,9 @@ public class ConditionalStatementTest{
 	@Test
 	public void testToStringBoolValue(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.EQUAL).value(true)
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.EQUAL)
+				.value(true)
 				.build();
 		assertEquals(columnName + " = true", stmt.toString());
 	}
@@ -133,7 +157,8 @@ public class ConditionalStatementTest{
 	@Test
 	public void testToStringColumnRefValue(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.NOT_EQUAL)
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.NOT_EQUAL)
 				.value(ColumnRef.builder().columnName("Derp").build())
 				.build();
 		assertEquals(columnName + " != Derp", stmt.toString());
@@ -142,8 +167,10 @@ public class ConditionalStatementTest{
 	@Test
 	public void testToStringNegated(){
 		stmt = ConditionalStatement.builder()
-				.column(ColumnRef.builder().columnName(columnName).build()).operator(SQLOperator.EQUAL).value("yep")
 				.negated()
+				.column(ColumnRef.builder().columnName(columnName).build())
+				.operator(SQLOperator.EQUAL)
+				.value("yep")
 				.build();
 		assertEquals("NOT " + columnName + " = 'yep'", stmt.toString());
 	}

@@ -38,7 +38,7 @@ public class TableRef{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class TableRefBuilder{
+	public static class TableRefBuilder implements TableName, AliasAndBuild{
 		/** The name of the table */
 		private String tableName;
 		/** The alias to use for the table */
@@ -47,20 +47,14 @@ public class TableRef{
 		/** Not allowed to instantiate outside TableRef */
 		private TableRefBuilder(){ }
 		
-		/**
-		 * @param tableName The name of the table
-		 * @return this, to continue building
-		 */
-		public TableRefBuilder tableName(String tableName){
+		/** {@inheritDoc} */
+		public AliasAndBuild tableName(String tableName){
 			this.tableName = tableName;
 			return this;
 		}
 		
-		/**
-		 * @param alias The alias to use for the table
-		 * @return this, to continue building
-		 */
-		public TableRefBuilder alias(String alias){
+		/** {@inheritDoc} */
+		public AliasAndBuild alias(String alias){
 			this.alias = alias;
 			return this;
 		}
@@ -83,11 +77,7 @@ public class TableRef{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link TableRef} with the set parameters
-		 *
-		 * @return The newly built {@link TableRef}
-		 */
+		/** {@inheritDoc} */
 		public TableRef build(){
 			checkForErrors();
 			
@@ -114,7 +104,7 @@ public class TableRef{
 	/**
 	 * @return A new {@link TableRefBuilder builder} to use to build a {@link TableRef}
 	 */
-	public static TableRefBuilder builder(){
+	public static TableName builder(){
 		return new TableRefBuilder();
 	}
 	
@@ -143,5 +133,38 @@ public class TableRef{
 		}
 		
 		return tableRef.toString();
+	}
+	
+	/*
+	 * Interfaces for the builder
+	 */
+	
+	/**
+	 * The Table Name part of building a {@link TableRef}
+	 */
+	public interface TableName{
+		/**
+		 * @param tableName The name of the table
+		 * @return this, to continue building
+		 */
+		AliasAndBuild tableName(String tableName);
+	}
+	
+	/**
+	 * The Alias and building part of building a {@link TableRef}
+	 */
+	public interface AliasAndBuild{
+		/**
+		 * @param alias The alias to use for the table
+		 * @return this, to continue building
+		 */
+		AliasAndBuild alias(String alias);
+		
+		/**
+		 * Builds a new {@link TableRef} with the set parameters
+		 *
+		 * @return The newly built {@link TableRef}
+		 */
+		TableRef build();
 	}
 }

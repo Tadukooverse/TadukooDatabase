@@ -26,7 +26,7 @@ public class SQLSelectStatementTest{
 				.tableName("Test")
 				.build();
 		stmt = SQLSelectStatement.builder()
-				.fromTable(fromTable)
+				.fromTables(fromTable)
 				.build();
 	}
 
@@ -53,7 +53,7 @@ public class SQLSelectStatementTest{
 				.columnName("Derp")
 				.build();
 		stmt = SQLSelectStatement.builder()
-				.returnColumn(column).fromTable(fromTable)
+				.returnColumns(column).fromTables(fromTable)
 				.build();
 		List<ColumnRef> returnColumns = stmt.getReturnColumns();
 		assertEquals(1, returnColumns.size());
@@ -67,7 +67,7 @@ public class SQLSelectStatementTest{
 				ColumnRef.builder().columnName("Derp2").build()
 		);
 		stmt = SQLSelectStatement.builder()
-				.returnColumns(columns).fromTable(fromTable)
+				.returnColumns(columns).fromTables(fromTable)
 				.build();
 		assertEquals(columns, stmt.getReturnColumns());
 	}
@@ -94,7 +94,7 @@ public class SQLSelectStatementTest{
 						.build())
 				.build();
 		stmt = SQLSelectStatement.builder()
-				.fromTable(fromTable).whereStatement(cond)
+				.fromTables(fromTable).whereStatement(cond)
 				.build();
 		assertEquals(cond, stmt.getWhereStatement());
 	}
@@ -102,7 +102,7 @@ public class SQLSelectStatementTest{
 	@Test
 	public void testBuilderMissingFromTable(){
 		try{
-			stmt = SQLSelectStatement.builder().build();
+			stmt = SQLSelectStatement.builder().fromTables().build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors trying to build a SQLSelectStatement: \n" +
@@ -119,7 +119,7 @@ public class SQLSelectStatementTest{
 	public void testToStringMultipleFromTables(){
 		TableRef table2 = TableRef.builder().tableName("Test2").build();
 		stmt = SQLSelectStatement.builder()
-				.fromTable(fromTable).fromTable(table2)
+				.fromTables(fromTable, table2)
 				.build();
 		assertEquals("SELECT * FROM " + fromTable.toString() + ", " + table2.toString(), stmt.toString());
 	}
@@ -128,7 +128,7 @@ public class SQLSelectStatementTest{
 	public void testToStringSingleReturnColumn(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
 		stmt = SQLSelectStatement.builder()
-				.returnColumn(column).fromTable(fromTable)
+				.returnColumns(column).fromTables(fromTable)
 				.build();
 		assertEquals("SELECT " + column.toString() + " FROM " + fromTable.toString(), stmt.toString());
 	}
@@ -138,7 +138,7 @@ public class SQLSelectStatementTest{
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
 		ColumnRef column2 = ColumnRef.builder().columnName("Derp2").build();
 		stmt = SQLSelectStatement.builder()
-				.returnColumn(column).returnColumn(column2).fromTable(fromTable)
+				.returnColumns(column, column2).fromTables(fromTable)
 				.build();
 		assertEquals("SELECT " + column.toString() + ", " + column2.toString() + " FROM " + fromTable.toString(),
 				stmt.toString());
@@ -154,7 +154,7 @@ public class SQLSelectStatementTest{
 						.build())
 				.build();
 		stmt = SQLSelectStatement.builder()
-				.fromTable(fromTable).whereStatement(cond)
+				.fromTables(fromTable).whereStatement(cond)
 				.build();
 		assertEquals("SELECT * FROM " + fromTable.toString() + " WHERE " + cond.toString(), stmt.toString());
 	}
@@ -172,8 +172,8 @@ public class SQLSelectStatementTest{
 						.build())
 				.build();
 		stmt = SQLSelectStatement.builder()
-				.returnColumn(column).returnColumn(column2)
-				.fromTable(fromTable).fromTable(table2)
+				.returnColumns(column, column2)
+				.fromTables(fromTable, table2)
 				.whereStatement(cond)
 				.build();
 		assertEquals("SELECT " + column.toString() + ", " + column2.toString() + " FROM " +

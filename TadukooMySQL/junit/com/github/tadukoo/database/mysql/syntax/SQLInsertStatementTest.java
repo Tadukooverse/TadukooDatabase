@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -16,14 +17,17 @@ public class SQLInsertStatementTest{
 	private SQLInsertStatement stmt;
 	private TableRef table;
 	private Object value;
+	private SQLSelectStatement selectStmt;
 	
 	@BeforeEach
 	public void setup(){
 		table = TableRef.builder().tableName("Test").build();
 		value = 42;
-		stmt = SQLInsertStatement.builder(table)
-				.value(value)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.values(value)
 				.build();
+		selectStmt = SQLSelectStatement.builder().fromTables(TableRef.builder().tableName("Derp").build()).build();
 	}
 	
 	@Test
@@ -44,10 +48,16 @@ public class SQLInsertStatementTest{
 	}
 	
 	@Test
+	public void testBuilderDefaultSelectStatement(){
+		assertNull(stmt.getSelectStmt());
+	}
+	
+	@Test
 	public void testBuilderSetColumn(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
-		stmt = SQLInsertStatement.builder(table)
-				.column(column).value(value)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.columns(column).values(value)
 				.build();
 		List<ColumnRef> columns = stmt.getColumns();
 		assertEquals(1, columns.size());
@@ -61,7 +71,8 @@ public class SQLInsertStatementTest{
 				ColumnRef.builder().columnName("Derp2").build()
 		);
 		List<Object> values = ListUtil.createList(value, "test");
-		stmt = SQLInsertStatement.builder(table)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
 				.columns(columns).values(values)
 				.build();
 		assertEquals(columns, stmt.getColumns());
@@ -69,10 +80,20 @@ public class SQLInsertStatementTest{
 	}
 	
 	@Test
+	public void testBuilderSetSelectStmt(){
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.selectStmt(selectStmt)
+				.build();
+		assertEquals(selectStmt, stmt.getSelectStmt());
+	}
+	
+	@Test
 	public void testBuilderMissingTable(){
 		try{
-			stmt = SQLInsertStatement.builder(null)
-					.value(value)
+			stmt = SQLInsertStatement.builder()
+					.table(null)
+					.values(value)
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -82,23 +103,27 @@ public class SQLInsertStatementTest{
 	}
 	
 	@Test
-	public void testBuilderMissingValues(){
+	public void testBuilderMissingValuesAndSelectStmt(){
 		try{
-			stmt = SQLInsertStatement.builder(table)
+			stmt = SQLInsertStatement.builder()
+					.table(table)
+					.values()
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Errors encountered while building SQLInsertStatement: \n" +
-					"values can't be empty!", e.getMessage());
+					"Must specify either values or selectStmt!", e.getMessage());
 		}
 	}
 	
 	@Test
 	public void testBuilderColumnsAndValuesSizeMismatch(){
 		try{
-			stmt = SQLInsertStatement.builder(table)
-					.column(ColumnRef.builder().columnName("Derp").build())
-					.column(ColumnRef.builder().columnName("Derp2").build()).value(value)
+			stmt = SQLInsertStatement.builder()
+					.table(table)
+					.columns(ColumnRef.builder().columnName("Derp").build(),
+							ColumnRef.builder().columnName("Derp2").build())
+					.values(value)
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -110,16 +135,17 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testBuilderAllErrors(){
 		try{
-			stmt = SQLInsertStatement.builder(null)
-					.column(ColumnRef.builder().columnName("Derp").build())
+			stmt = SQLInsertStatement.builder()
+					.table(null)
+					.columns(ColumnRef.builder().columnName("Derp").build())
+					.values()
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("""
 					Errors encountered while building SQLInsertStatement:\s
 					table is required!
-					values can't be empty!
-					Number of columns must equal number of values if specified!""", e.getMessage());
+					Must specify either values or selectStmt!""", e.getMessage());
 		}
 	}
 	
@@ -131,8 +157,9 @@ public class SQLInsertStatementTest{
 	
 	@Test
 	public void testToStringMultipleValues(){
-		stmt = SQLInsertStatement.builder(table)
-				.value(value).value(true)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.values(value, true)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " VALUES (" +
 				SQLSyntaxUtil.convertValueToString(value) + ", " + SQLSyntaxUtil.convertValueToString(true) + ")",
@@ -142,22 +169,46 @@ public class SQLInsertStatementTest{
 	@Test
 	public void testToStringWithColumn(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
-		stmt = SQLInsertStatement.builder(table)
-				.column(column).value(value)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.columns(column).values(value)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " (" + column.toString() + ") VALUES (" +
 				SQLSyntaxUtil.convertValueToString(value) + ")", stmt.toString());
 	}
 	
 	@Test
-	public void testToStringWithEverything(){
+	public void testToStringWithEverythingValues(){
 		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
 		ColumnRef column2 = ColumnRef.builder().columnName("Derp2").build();
-		stmt = SQLInsertStatement.builder(table)
-				.column(column).column(column2).value(value).value(true)
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.columns(column, column2).values(value, true)
 				.build();
 		assertEquals("INSERT INTO " + table.toString() + " (" + column.toString() + ", " + column2.toString() +
 				") VALUES (" + SQLSyntaxUtil.convertValueToString(value) + ", " +
 				SQLSyntaxUtil.convertValueToString(true) + ")", stmt.toString());
+	}
+	
+	@Test
+	public void testToStringWithSelectStmt(){
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.selectStmt(selectStmt)
+				.build();
+		assertEquals("INSERT INTO " + table.toString() + " " + selectStmt.toString(), stmt.toString());
+	}
+	
+	@Test
+	public void testToStringWithEverythingSelectStmt(){
+		ColumnRef column = ColumnRef.builder().columnName("Derp").build();
+		ColumnRef column2 = ColumnRef.builder().columnName("Derp2").build();
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.columns(column, column2)
+				.selectStmt(selectStmt)
+				.build();
+		assertEquals("INSERT INTO " + table.toString() + " (" + column.toString() + ", " + column2.toString() +
+				") " + selectStmt.toString(), stmt.toString());
 	}
 }

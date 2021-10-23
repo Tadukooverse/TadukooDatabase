@@ -51,7 +51,7 @@ public class ConditionalStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class ConditionStatementBuilder{
+	public static class ConditionStatementBuilder implements Column, Operator, Value, Build{
 		/** Whether the statement is negated or not */
 		private boolean negated = false;
 		/** The {@link ColumnRef} to the column of the statement */
@@ -64,48 +64,32 @@ public class ConditionalStatement{
 		/** Not allowed to instantiate outside ConditionalStatement */
 		private ConditionStatementBuilder(){ }
 		
-		/**
-		 * @param negated Whether the statement is negated or not
-		 * @return this, to continue building
-		 */
-		public ConditionStatementBuilder negated(boolean negated){
+		/** {@inheritDoc} */
+		public Column negated(boolean negated){
 			this.negated = negated;
 			return this;
 		}
 		
-		/**
-		 * Sets negated to true for the statement
-		 *
-		 * @return this, to continue building
-		 */
-		public ConditionStatementBuilder negated(){
+		/** {@inheritDoc} */
+		public Column negated(){
 			negated = true;
 			return this;
 		}
 		
-		/**
-		 * @param column The {@link ColumnRef} to the column of the statement
-		 * @return this, to continue building
-		 */
-		public ConditionStatementBuilder column(ColumnRef column){
+		/** {@inheritDoc} */
+		public Operator column(ColumnRef column){
 			this.column = column;
 			return this;
 		}
 		
-		/**
-		 * @param operator The {@link SQLOperator operator} of the statement
-		 * @return this, to continue building
-		 */
-		public ConditionStatementBuilder operator(SQLOperator operator){
+		/** {@inheritDoc} */
+		public Value operator(SQLOperator operator){
 			this.operator = operator;
 			return this;
 		}
 		
-		/**
-		 * @param value The value of the statement
-		 * @return this, to continue building
-		 */
-		public ConditionStatementBuilder value(Object value){
+		/** {@inheritDoc} */
+		public Build value(Object value){
 			this.value = value;
 			return this;
 		}
@@ -138,11 +122,7 @@ public class ConditionalStatement{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link ConditionalStatement} using the set parameters
-		 *
-		 * @return The newly built {@link ConditionalStatement}
-		 */
+		/** {@inheritDoc} */
 		public ConditionalStatement build(){
 			checkForErrors();
 			
@@ -177,7 +157,7 @@ public class ConditionalStatement{
 	/**
 	 * @return A new {@link ConditionStatementBuilder builder} to build a {@link ConditionalStatement}
 	 */
-	public static ConditionStatementBuilder builder(){
+	public static Column builder(){
 		return new ConditionStatementBuilder();
 	}
 	
@@ -214,5 +194,67 @@ public class ConditionalStatement{
 	public String toString(){
 		return (negated?"NOT ":"") + column.toString() + " " + operator.toString() + " " +
 				SQLSyntaxUtil.convertValueToString(value);
+	}
+	
+	/*
+	 * Interfaces for Builder
+	 */
+	
+	/**
+	 * The {@link ColumnRef Column} part of building a {@link ConditionalStatement}
+	 */
+	public interface Column{
+		/**
+		 * @param negated Whether the statement is negated or not
+		 * @return this, to continue building
+		 */
+		Column negated(boolean negated);
+		
+		/**
+		 * Sets negated to true for the statement
+		 *
+		 * @return this, to continue building
+		 */
+		Column negated();
+		
+		/**
+		 * @param column The {@link ColumnRef} to the column of the statement
+		 * @return this, to continue building
+		 */
+		Operator column(ColumnRef column);
+	}
+	
+	/**
+	 * The {@link SQLOperator Operator} part of building a {@link ConditionalStatement}
+	 */
+	public interface Operator{
+		/**
+		 * @param operator The {@link SQLOperator operator} of the statement
+		 * @return this, to continue building
+		 */
+		Value operator(SQLOperator operator);
+	}
+	
+	/**
+	 * The Value part of building a {@link ConditionalStatement}
+	 */
+	public interface Value{
+		/**
+		 * @param value The value of the statement
+		 * @return this, to continue building
+		 */
+		Build value(Object value);
+	}
+	
+	/**
+	 * The building part of building a {@link ConditionalStatement}
+	 */
+	public interface Build{
+		/**
+		 * Builds a new {@link ConditionalStatement} using the set parameters
+		 *
+		 * @return The newly built {@link ConditionalStatement}
+		 */
+		ConditionalStatement build();
 	}
 }

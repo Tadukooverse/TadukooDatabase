@@ -47,7 +47,7 @@ public class SQLSelectStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLSelectStatementBuilder{
+	public static class SQLSelectStatementBuilder implements ColumnsAndTables, WhereStatementAndBuild{
 		/** The columns to be selected */
 		private List<ColumnRef> returnColumns = new ArrayList<>();
 		/** The tables to grab data from */
@@ -58,47 +58,32 @@ public class SQLSelectStatement{
 		/** Not allowed to instantiate outside SQLSelectStatement */
 		private SQLSelectStatementBuilder(){ }
 		
-		/**
-		 * @param returnColumns The columns to be selected
-		 * @return this, to continue building
-		 */
-		public SQLSelectStatementBuilder returnColumns(List<ColumnRef> returnColumns){
+		/** {@inheritDoc} */
+		public ColumnsAndTables returnColumns(List<ColumnRef> returnColumns){
 			this.returnColumns = returnColumns;
 			return this;
 		}
 		
-		/**
-		 * @param returnColumn A column to be selected (will be added to the list)
-		 * @return this, to continue building
-		 */
-		public SQLSelectStatementBuilder returnColumn(ColumnRef returnColumn){
-			this.returnColumns.add(returnColumn);
+		/** {@inheritDoc} */
+		public ColumnsAndTables returnColumns(ColumnRef ... returnColumns){
+			this.returnColumns = ListUtil.createList(returnColumns);
 			return this;
 		}
 		
-		/**
-		 * @param fromTables The tables to grab data from
-		 * @return this, to continue building
-		 */
-		public SQLSelectStatementBuilder fromTables(List<TableRef> fromTables){
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild fromTables(List<TableRef> fromTables){
 			this.fromTables = fromTables;
 			return this;
 		}
 		
-		/**
-		 * @param fromTable A table to grab data from (gets added to the list)
-		 * @return this, to continue building
-		 */
-		public SQLSelectStatementBuilder fromTable(TableRef fromTable){
-			this.fromTables.add(fromTable);
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild fromTables(TableRef ... fromTables){
+			this.fromTables = ListUtil.createList(fromTables);
 			return this;
 		}
 		
-		/**
-		 * @param whereStatement The conditional where statement
-		 * @return this, to continue building
-		 */
-		public SQLSelectStatementBuilder whereStatement(Conditional whereStatement){
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild whereStatement(Conditional whereStatement){
 			this.whereStatement = whereStatement;
 			return this;
 		}
@@ -121,11 +106,7 @@ public class SQLSelectStatement{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link SQLSelectStatement} using the set parameters
-		 *
-		 * @return The newly built {@link SQLSelectStatement}
-		 */
+		/** {@inheritDoc} */
 		public SQLSelectStatement build(){
 			checkForErrors();
 			
@@ -156,7 +137,7 @@ public class SQLSelectStatement{
 	/**
 	 * @return A new {@link SQLSelectStatementBuilder builder} to build a {@link SQLSelectStatement}
 	 */
-	public static SQLSelectStatementBuilder builder(){
+	public static ColumnsAndTables builder(){
 		return new SQLSelectStatementBuilder();
 	}
 	
@@ -216,5 +197,56 @@ public class SQLSelectStatement{
 		
 		// Return the statement we built
 		return statement.toString();
+	}
+	
+	/*
+	 * Interfaces for the builder
+	 */
+	
+	/**
+	 * The {@link ColumnRef Columns} and {@link TableRef Tables} part of building a {@link SQLSelectStatement}
+	 */
+	public interface ColumnsAndTables{
+		/**
+		 * @param returnColumns The columns to be selected
+		 * @return this, to continue building
+		 */
+		ColumnsAndTables returnColumns(List<ColumnRef> returnColumns);
+		
+		/**
+		 * @param returnColumns The columns to be selected
+		 * @return this, to continue building
+		 */
+		ColumnsAndTables returnColumns(ColumnRef ... returnColumns);
+		
+		/**
+		 * @param fromTables The tables to grab data from
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild fromTables(List<TableRef> fromTables);
+		
+		/**
+		 * @param fromTables The tables to grab data from
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild fromTables(TableRef ... fromTables);
+	}
+	
+	/**
+	 * The {@link Conditional Where Statement} and building part of building a {@link SQLSelectStatement}
+	 */
+	public interface WhereStatementAndBuild{
+		/**
+		 * @param whereStatement The conditional where statement
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild whereStatement(Conditional whereStatement);
+		
+		/**
+		 * Builds a new {@link SQLSelectStatement} using the set parameters
+		 *
+		 * @return The newly built {@link SQLSelectStatement}
+		 */
+		SQLSelectStatement build();
 	}
 }

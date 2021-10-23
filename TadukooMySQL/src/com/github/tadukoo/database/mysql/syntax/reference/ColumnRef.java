@@ -38,7 +38,7 @@ public class ColumnRef{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class ColumnRefBuilder{
+	public static class ColumnRefBuilder implements ColumnName, AliasAndBuild{
 		/** The name of the column */
 		private String columnName;
 		/** The alias to use for the column */
@@ -47,20 +47,14 @@ public class ColumnRef{
 		/** Not allowed to instantiate outside ColumnRef */
 		private ColumnRefBuilder(){ }
 		
-		/**
-		 * @param columnName The name of the column
-		 * @return this, to continue building
-		 */
-		public ColumnRefBuilder columnName(String columnName){
+		/** {@inheritDoc} */
+		public AliasAndBuild columnName(String columnName){
 			this.columnName = columnName;
 			return this;
 		}
 		
-		/**
-		 * @param alias The alias to use for the column
-		 * @return this, to continue building
-		 */
-		public ColumnRefBuilder alias(String alias){
+		/** {@inheritDoc} */
+		public AliasAndBuild alias(String alias){
 			this.alias = alias;
 			return this;
 		}
@@ -83,11 +77,7 @@ public class ColumnRef{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link ColumnRef} using the set parameters
-		 *
-		 * @return The newly built {@link ColumnRef}
-		 */
+		/** {@inheritDoc} */
 		public ColumnRef build(){
 			checkForErrors();
 			
@@ -114,7 +104,7 @@ public class ColumnRef{
 	/**
 	 * @return A {@link ColumnRefBuilder builder} to use to build a {@link ColumnRef}
 	 */
-	public static ColumnRefBuilder builder(){
+	public static ColumnName builder(){
 		return new ColumnRefBuilder();
 	}
 	
@@ -150,5 +140,38 @@ public class ColumnRef{
 		}
 		
 		return columnRef.toString();
+	}
+	
+	/*
+	 * Interfaces for the builder
+	 */
+	
+	/**
+	 * The Column Name part of building a {@link ColumnRef}
+	 */
+	public interface ColumnName{
+		/**
+		 * @param columnName The name of the column
+		 * @return this, to continue building
+		 */
+		AliasAndBuild columnName(String columnName);
+	}
+	
+	/**
+	 * The Alias and building part of building a {@link ColumnRef}
+	 */
+	public interface AliasAndBuild{
+		/**
+		 * @param alias The alias to use for the column
+		 * @return this, to continue building
+		 */
+		AliasAndBuild alias(String alias);
+		
+		/**
+		 * Builds a new {@link ColumnRef} using the set parameters
+		 *
+		 * @return The newly built {@link ColumnRef}
+		 */
+		ColumnRef build();
 	}
 }

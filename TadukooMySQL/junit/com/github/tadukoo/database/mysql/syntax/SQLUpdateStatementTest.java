@@ -25,8 +25,9 @@ public class SQLUpdateStatementTest{
 	public void setup(){
 		table = TableRef.builder().tableName("Test").build();
 		setStatement = new EqualsStatement(ColumnRef.builder().columnName("Derp").build(), 42);
-		stmt = SQLUpdateStatement.builder(table)
-				.setStatement(setStatement)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
+				.setStatements(setStatement)
 				.build();
 	}
 	
@@ -53,7 +54,8 @@ public class SQLUpdateStatementTest{
 				setStatement,
 				new EqualsStatement(ColumnRef.builder().columnName("Derp2").build(), true)
 		);
-		stmt = SQLUpdateStatement.builder(table)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
 				.setStatements(setStatements)
 				.build();
 		assertEquals(setStatements, stmt.getSetStatements());
@@ -68,8 +70,9 @@ public class SQLUpdateStatementTest{
 						.value(67)
 						.build())
 				.build();
-		stmt = SQLUpdateStatement.builder(table)
-				.setStatement(setStatement).whereStatement(where)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
+				.setStatements(setStatement).whereStatement(where)
 				.build();
 		assertEquals(where, stmt.getWhereStatement());
 	}
@@ -77,8 +80,9 @@ public class SQLUpdateStatementTest{
 	@Test
 	public void testBuilderMissingTable(){
 		try{
-			stmt = SQLUpdateStatement.builder(null)
-					.setStatement(setStatement)
+			stmt = SQLUpdateStatement.builder()
+					.table(null)
+					.setStatements(setStatement)
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -90,7 +94,9 @@ public class SQLUpdateStatementTest{
 	@Test
 	public void testBuilderMissingSetStatements(){
 		try{
-			stmt = SQLUpdateStatement.builder(table)
+			stmt = SQLUpdateStatement.builder()
+					.table(table)
+					.setStatements()
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -102,7 +108,9 @@ public class SQLUpdateStatementTest{
 	@Test
 	public void testBuilderMissingAll(){
 		try{
-			stmt = SQLUpdateStatement.builder(null)
+			stmt = SQLUpdateStatement.builder()
+					.table(null)
+					.setStatements()
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
@@ -121,8 +129,9 @@ public class SQLUpdateStatementTest{
 	@Test
 	public void testToStringMultipleSetStatements(){
 		EqualsStatement setStatement2 = new EqualsStatement(ColumnRef.builder().columnName("Derp2").build(), true);
-		stmt = SQLUpdateStatement.builder(table)
-				.setStatement(setStatement).setStatement(setStatement2)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
+				.setStatements(setStatement, setStatement2)
 				.build();
 		assertEquals("UPDATE " + table + " SET " + setStatement + ", " + setStatement2, stmt.toString());
 	}
@@ -136,8 +145,9 @@ public class SQLUpdateStatementTest{
 						.value(67)
 						.build())
 				.build();
-		stmt = SQLUpdateStatement.builder(table)
-				.setStatement(setStatement).whereStatement(where)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
+				.setStatements(setStatement).whereStatement(where)
 				.build();
 		assertEquals("UPDATE " + table + " SET " + setStatement + " WHERE " + where, stmt.toString());
 	}
@@ -152,8 +162,9 @@ public class SQLUpdateStatementTest{
 						.value(67)
 						.build())
 				.build();
-		stmt = SQLUpdateStatement.builder(table)
-				.setStatement(setStatement).setStatement(setStatement2).whereStatement(where)
+		stmt = SQLUpdateStatement.builder()
+				.table(table)
+				.setStatements(setStatement, setStatement2).whereStatement(where)
 				.build();
 		assertEquals("UPDATE " + table + " SET " + setStatement + ", " + setStatement2 + " WHERE " + where,
 				stmt.toString());

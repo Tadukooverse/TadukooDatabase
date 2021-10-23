@@ -40,26 +40,25 @@ public class SQLDeleteStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLDeleteStatementBuilder{
+	public static class SQLDeleteStatementBuilder implements Table, WhereStatementAndBuild{
 		/** The {@link TableRef table} to delete from */
-		private final TableRef table;
+		private TableRef table;
 		/** The {@link Conditional where statement} to use for what to delete */
 		private Conditional whereStatement = null;
 		
 		/**
 		 * Not allowed to instantiate outside {@link SQLDeleteStatement}
-		 *
-		 * @param table The {@link TableRef table} to delete from
 		 */
-		private SQLDeleteStatementBuilder(TableRef table){
+		private SQLDeleteStatementBuilder(){ }
+		
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild table(TableRef table){
 			this.table = table;
+			return this;
 		}
 		
-		/**
-		 * @param whereStatement The {@link Conditional where statement} to use for what to delete
-		 * @return this, to continue building
-		 */
-		public SQLDeleteStatementBuilder whereStatement(Conditional whereStatement){
+		/** {@inheritDoc} */
+		public WhereStatementAndBuild whereStatement(Conditional whereStatement){
 			this.whereStatement = whereStatement;
 			return this;
 		}
@@ -82,11 +81,7 @@ public class SQLDeleteStatement{
 			}
 		}
 		
-		/**
-		 * Builds a new {@link SQLDeleteStatement} with the given parameters
-		 *
-		 * @return The newly built {@link SQLDeleteStatement}
-		 */
+		/** {@inheritDoc} */
 		public SQLDeleteStatement build(){
 			checkForErrors();
 			
@@ -111,11 +106,10 @@ public class SQLDeleteStatement{
 	}
 	
 	/**
-	 * @param table The {@link TableRef table} to delete from
 	 * @return A new {@link SQLDeleteStatementBuilder builder} to build a {@link SQLDeleteStatement}
 	 */
-	public static SQLDeleteStatementBuilder builder(TableRef table){
-		return new SQLDeleteStatementBuilder(table);
+	public static Table builder(){
+		return new SQLDeleteStatementBuilder();
 	}
 	
 	/**
@@ -136,5 +130,38 @@ public class SQLDeleteStatement{
 	@Override
 	public String toString(){
 		return "DELETE FROM " + table + (whereStatement == null?"":" WHERE " + whereStatement);
+	}
+	
+	/*
+	 * Interfaces for builder
+	 */
+	
+	/**
+	 * The {@link TableRef table} part of building a {@link SQLDeleteStatement}
+	 */
+	public interface Table{
+		/**
+		 * @param table The {@link TableRef table} to delete from
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild table(TableRef table);
+	}
+	
+	/**
+	 * The {@link Conditional Where Statement} and building part of building a {@link SQLDeleteStatement}
+	 */
+	public interface WhereStatementAndBuild{
+		/**
+		 * @param whereStatement The {@link Conditional where statement} to use for what to delete
+		 * @return this, to continue building
+		 */
+		WhereStatementAndBuild whereStatement(Conditional whereStatement);
+		
+		/**
+		 * Builds a new {@link SQLDeleteStatement} with the given parameters
+		 *
+		 * @return The newly built {@link SQLDeleteStatement}
+		 */
+		SQLDeleteStatement build();
 	}
 }
