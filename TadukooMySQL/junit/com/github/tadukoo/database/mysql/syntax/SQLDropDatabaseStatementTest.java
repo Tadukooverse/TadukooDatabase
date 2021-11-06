@@ -7,37 +7,87 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SQLDropDatabaseStatementTest{
-	private SQLDropDatabaseStatement stmt;
+	private SQLDropStatement stmt;
 	private String databaseName;
+	private String tableName;
 	
 	@BeforeEach
 	public void setup(){
 		databaseName = "Test";
-		stmt = SQLDropDatabaseStatement.builder()
-				.databaseName(databaseName)
+		tableName = "Derp";
+		stmt = SQLDropStatement.builder()
+				.database()
+				.name(databaseName)
 				.build();
 	}
 	
 	@Test
-	public void testBuilder(){
-		assertEquals(databaseName, stmt.getDatabaseName());
+	public void testBuilderSetTypeDatabase(){
+		assertEquals(SQLType.DATABASE, stmt.getType());
+	}
+	
+	@Test
+	public void testBuilderSetDatabaseName(){
+		assertEquals(databaseName, stmt.getName());
 	}
 	
 	@Test
 	public void testBuilderMissingDatabaseName(){
 		try{
-			stmt = SQLDropDatabaseStatement.builder()
-					.databaseName(null)
+			stmt = SQLDropStatement.builder()
+					.database()
+					.name(null)
 					.build();
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered the following errors in building a " +
-					"SQLDropDatabaseStatement: \ndatabaseName is required!", e.getMessage());
+					"SQLDropStatement: \nname is required!", e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testToString(){
-		assertEquals("DROP DATABASE " + databaseName, stmt.toString());
+	public void testBuilderSetTypeTable(){
+		stmt = SQLDropStatement.builder()
+				.table()
+				.name(tableName)
+				.build();
+		assertEquals(SQLType.TABLE, stmt.getType());
+	}
+	
+	@Test
+	public void testBuilderSetTableName(){
+		stmt = SQLDropStatement.builder()
+				.table()
+				.name(tableName)
+				.build();
+		assertEquals(tableName, stmt.getName());
+	}
+	
+	@Test
+	public void testBuilderMissingTableName(){
+		try{
+			stmt = SQLDropStatement.builder()
+					.table()
+					.name(null)
+					.build();
+			fail();
+		}catch(IllegalArgumentException e){
+			assertEquals("Encountered the following errors in building a " +
+					"SQLDropStatement: \nname is required!", e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testToStringDatabase(){
+		assertEquals("DROP " + SQLType.DATABASE + " " + databaseName, stmt.toString());
+	}
+	
+	@Test
+	public void testToStringTable(){
+		stmt = SQLDropStatement.builder()
+				.table()
+				.name(tableName)
+				.build();
+		assertEquals("DROP " + SQLType.TABLE + " " + tableName, stmt.toString());
 	}
 }
