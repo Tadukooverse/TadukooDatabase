@@ -9,22 +9,10 @@ import com.github.tadukoo.util.StringUtil;
  * @version Alpha v.0.3
  */
 public enum SQLType{
-	/** Represents a Table in MySQL - TABLE */
-	TABLE("TABLE"),
-	/** Represents a Database in MySQL - DATABASE */
-	DATABASE("DATABASE");
-	
-	/** The type as a String */
-	private final String type;
-	
-	/**
-	 * Constructs a new SQLType with the given parameters
-	 *
-	 * @param type The type as a String
-	 */
-	SQLType(String type){
-		this.type = type;
-	}
+	/** Represents a Table in MySQL */
+	TABLE,
+	/** Represents a Database in MySQL */
+	DATABASE;
 	
 	/**
 	 * Find a SQLType using its type as a String
@@ -34,16 +22,10 @@ public enum SQLType{
 	 */
 	public static SQLType fromType(String type){
 		for(SQLType typeE: values()){
-			if(StringUtil.equalsIgnoreCase(typeE.type, type)){
+			if(StringUtil.equalsIgnoreCase(typeE.name(), type)){
 				return typeE;
 			}
 		}
 		return null;
-	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public String toString(){
-		return type;
 	}
 }
