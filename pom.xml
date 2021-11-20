@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.github.tadukoo.maven</groupId>
 		<artifactId>TadukooMavenLibraryPOM</artifactId>
-		<version>0.3-Alpha</version>
+		<version>0.3.1-Alpha</version>
 	</parent>
 	<groupId>com.github.tadukoo.database</groupId>
 	<artifactId>TadukooDatabaseParent</artifactId>
@@ -19,7 +19,7 @@
 	<properties>
 		<!-- Info -->
 		<shortName>TadukooDatabase</shortName>
-		<tadukoo.util.version>0.5-Beta</tadukoo.util.version>
+		<tadukoo.util.version>0.5.1-Beta</tadukoo.util.version>
 		
 		<!-- MariaDB Versions -->
 		<mariadb.version>2.7.3</mariadb.version>
