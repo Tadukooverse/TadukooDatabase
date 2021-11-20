@@ -74,7 +74,7 @@ public class SQLCreateStatementTest{
 				ColumnDefinition.builder()
 						.columnName("Derp")
 						.bit()
-						.defaultSize()
+						.defaultLength()
 						.build(),
 				ColumnDefinition.builder()
 						.columnName("Derp2")
@@ -98,7 +98,7 @@ public class SQLCreateStatementTest{
 		ColumnDefinition col1 = ColumnDefinition.builder()
 				.columnName("Derp")
 				.bit()
-				.defaultSize()
+				.defaultLength()
 				.build();
 		ColumnDefinition col2 = ColumnDefinition.builder()
 				.columnName("Derp2")
@@ -190,7 +190,7 @@ public class SQLCreateStatementTest{
 		ColumnDefinition col1 = ColumnDefinition.builder()
 				.columnName("Derp")
 				.bit()
-				.defaultSize()
+				.defaultLength()
 				.build();
 		ColumnDefinition col2 = ColumnDefinition.builder()
 				.columnName("Derp2")

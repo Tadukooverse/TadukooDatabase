@@ -54,13 +54,19 @@ public class ColumnDefinition{
 	 *         <td>The precision for fractional seconds</td>
 	 *         <td>Required for some data types - otherwise defaults to -1</td>
 	 *     </tr>
+	 *     <tr>
+	 *         <td>autoIncrement</td>
+	 *         <td>Whether to auto-increment the column or not</td>
+	 *         <td>Defaults to false</td>
+	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class ColumnDefinitionBuilder implements ColumnName, DataType, Size, AllowDefaultSize,
-			AllowDefaultSizeLong, SizeAndDigits, Values, FractionalSecondsPrecision, Build{
+	public static class ColumnDefinitionBuilder implements ColumnName, DataType, Length, AllowDefaultLength,
+			AllowDefaultLengthLong, Size, AllowDefaultSize, SizeAndDigits, Values, FractionalSecondsPrecision,
+			AutoIncrementOrBuild, Build{
 		/** The name to use for the column */
 		private String columnName;
 		/** The {@link SQLDataType data type} of the column */
@@ -73,6 +79,8 @@ public class ColumnDefinition{
 		private Integer digits = null;
 		/** The precision for fractional seconds */
 		private Integer fractionalSecondsPrecision = null;
+		/** Whether to auto-increment the column or not */
+		private boolean autoIncrement = false;
 		
 		/** Not allowed to instantiate outside of {@link ColumnDefinition} */
 		private ColumnDefinitionBuilder(){ }
@@ -90,28 +98,28 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public AllowDefaultSize character(){
+		public AllowDefaultLength character(){
 			this.dataType = SQLDataType.CHAR;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Size varchar(){
+		public Length varchar(){
 			this.dataType = SQLDataType.VARCHAR;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public AllowDefaultSize binary(){
+		public AllowDefaultLength binary(){
 			this.dataType = SQLDataType.BINARY;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Size varbinary(){
+		public Length varbinary(){
 			this.dataType = SQLDataType.VARBINARY;
 			return this;
 		}
@@ -132,14 +140,14 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public AllowDefaultSizeLong text(){
+		public AllowDefaultLengthLong text(){
 			this.dataType = SQLDataType.TEXT;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public AllowDefaultSizeLong blob(){
+		public AllowDefaultLengthLong blob(){
 			this.dataType = SQLDataType.BLOB;
 			return this;
 		}
@@ -188,7 +196,7 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public AllowDefaultSize bit(){
+		public AllowDefaultLength bit(){
 			this.dataType = SQLDataType.BIT;
 			return this;
 		}
@@ -297,28 +305,42 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build size(int size){
-			this.size = Integer.valueOf(size).longValue();
+		public Build length(int length){
+			this.size = Integer.valueOf(length).longValue();
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build defaultSize(){
+		public Build defaultLength(){
 			// Don't set size (keep null to use default)
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build size(long size){
-			this.size = size;
+		public Build length(long length){
+			this.size = length;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build sizeAndDigits(int size, int digits){
+		public AutoIncrementOrBuild size(int size){
+			this.size = Integer.valueOf(size).longValue();
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public AutoIncrementOrBuild defaultSize(){
+			// Don't set size (keep null to use default)
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public AutoIncrementOrBuild sizeAndDigits(int size, int digits){
 			this.size = Integer.valueOf(size).longValue();
 			this.digits = digits;
 			return this;
@@ -326,7 +348,7 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build defaultSizeAndDigits(){
+		public AutoIncrementOrBuild defaultSizeAndDigits(){
 			// Don't set size and digits (keep null to use defaults)
 			return this;
 		}
@@ -356,6 +378,17 @@ public class ColumnDefinition{
 		@Override
 		public Build defaultFractionalSecondsPrecision(){
 			// Don't set fractional seconds precision (keep null to use default)
+			return this;
+		}
+		
+		/*
+		 * Special Conditions
+		 */
+		
+		/** {@inheritDoc} */
+		@Override
+		public Build autoIncrement(){
+			this.autoIncrement = true;
 			return this;
 		}
 		
@@ -396,7 +429,7 @@ public class ColumnDefinition{
 			
 			// Size must be between 0 and 65,535 for VARCHAR/VARBINARY
 			if((dataType == SQLDataType.VARCHAR || dataType == SQLDataType.VARBINARY) &&
-					size != null && (size < 0 || size > 65535)){
+					(size < 0 || size > 65535)){
 				errors.add("For " + dataType + " size must be between 0 and 65,535!");
 			}
 			
@@ -447,7 +480,8 @@ public class ColumnDefinition{
 		public ColumnDefinition build(){
 			checkForErrors();
 			
-			return new ColumnDefinition(columnName, dataType, size, values, digits, fractionalSecondsPrecision);
+			return new ColumnDefinition(columnName, dataType, size, values, digits, fractionalSecondsPrecision,
+					autoIncrement);
 		}
 	}
 	
@@ -463,6 +497,8 @@ public class ColumnDefinition{
 	private final Integer digits;
 	/** The precision for fractional seconds */
 	private final Integer fractionalSecondsPrecision;
+	/** Whether to auto-increment this column or not */
+	private final boolean autoIncrement;
 	
 	/**
 	 * Constructs a new {@link ColumnDefinition} with the given parameters
@@ -473,16 +509,19 @@ public class ColumnDefinition{
 	 * @param values The possible values for the column
 	 * @param digits The number of digits after the decimal
 	 * @param fractionalSecondsPrecision The precision for fractional seconds
+	 * @param autoIncrement Whether to auto-increment this column or not
 	 */
 	private ColumnDefinition(
 			String columnName, SQLDataType dataType,
-			Long size, List<String> values, Integer digits, Integer fractionalSecondsPrecision){
+			Long size, List<String> values, Integer digits, Integer fractionalSecondsPrecision,
+			boolean autoIncrement){
 		this.columnName = columnName;
 		this.dataType = dataType;
 		this.size = size;
 		this.values = values;
 		this.digits = digits;
 		this.fractionalSecondsPrecision = fractionalSecondsPrecision;
+		this.autoIncrement = autoIncrement;
 	}
 	
 	/**
@@ -534,6 +573,13 @@ public class ColumnDefinition{
 		return fractionalSecondsPrecision;
 	}
 	
+	/**
+	 * @return Whether to auto-increment this column or not
+	 */
+	public boolean isAutoIncremented(){
+		return autoIncrement;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
@@ -567,6 +613,11 @@ public class ColumnDefinition{
 			colDef.append('(').append(fractionalSecondsPrecision).append(')');
 		}
 		
+		// Add auto-increment if we have it
+		if(autoIncrement){
+			colDef.append(" AUTO_INCREMENT");
+		}
+		
 		return colDef.toString();
 	}
 	
@@ -591,35 +642,35 @@ public class ColumnDefinition{
 	public interface DataType{
 		/**
 		 * Sets the data type to {@link SQLDataType#CHAR CHAR}.
-		 * Size specifies the column length in characters - can be 0 to 255. Defaults to 1
+		 * Length specifies the column length in characters - can be 0 to 255. Defaults to 1
 		 *
 		 * @return this, to continue building
 		 */
-		AllowDefaultSize character();
+		AllowDefaultLength character();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#VARCHAR VARCHAR}.
-		 * Size specifies the column length in characters - can be 0 to 65,535
+		 * Length specifies the column length in characters - can be 0 to 65,535
 		 *
 		 * @return this, to continue building
 		 */
-		Size varchar();
+		Length varchar();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#BINARY BINARY}.
-		 * Size specifies the column length in bytes - can be 0 to 255. Defaults to 1
+		 * Length specifies the column length in bytes - can be 0 to 255. Defaults to 1
 		 *
 		 * @return this, to continue building
 		 */
-		AllowDefaultSize binary();
+		AllowDefaultLength binary();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#VARBINARY VARBINARY}.
-		 * Size specifies the column length in bytes - can be 0 to 65,535
+		 * Length specifies the column length in bytes - can be 0 to 65,535
 		 *
 		 * @return this, to continue building
 		 */
-		Size varbinary();
+		Length varbinary();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#TINYBLOB TINYBLOB}.
@@ -637,19 +688,19 @@ public class ColumnDefinition{
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#TEXT TEXT}.
-		 * If you specify size, MySQL will pick the smallest text type that can fit that many characters.
+		 * If you specify length, MySQL will pick the smallest text type that can fit that many characters.
 		 *
 		 * @return this, to continue building
 		 */
-		AllowDefaultSizeLong text();
+		AllowDefaultLengthLong text();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#BLOB BLOB}.
-		 * If you specify size, MySQL will pick the smallest blob type that can fit that many bytes.
+		 * If you specify length, MySQL will pick the smallest blob type that can fit that many bytes.
 		 *
 		 * @return this, to continue building
 		 */
-		AllowDefaultSizeLong blob();
+		AllowDefaultLengthLong blob();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#MEDIUMTEXT MEDIUMTEXT}.
@@ -701,7 +752,7 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		AllowDefaultSize bit();
+		AllowDefaultLength bit();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#TINYINT TINYINT}.
@@ -818,6 +869,39 @@ public class ColumnDefinition{
 	}
 	
 	/**
+	 * The Length part of building a {@link ColumnDefinition}
+	 */
+	public interface Length{
+		/**
+		 * @param length The length of the column
+		 * @return this, to continue building
+		 */
+		Build length(int length);
+	}
+	
+	/**
+	 * The Length part of building a {@link ColumnDefinition}, allowing using a default length
+	 */
+	public interface AllowDefaultLength extends Length{
+		/**
+		 * Sets length to the default for the data type
+		 * @return this, to continue building
+		 */
+		Build defaultLength();
+	}
+	
+	/**
+	 * The Length part of building a {@link ColumnDefinition}, allowing using a default length and using a long
+	 */
+	public interface AllowDefaultLengthLong extends AllowDefaultLength{
+		/**
+		 * @param length The length to use for the column
+		 * @return this, to continue building
+		 */
+		Build length(long length);
+	}
+	
+	/**
 	 * The Size part of building a {@link ColumnDefinition}
 	 */
 	public interface Size{
@@ -825,7 +909,7 @@ public class ColumnDefinition{
 		 * @param size The length of the column
 		 * @return this, to continue building
 		 */
-		Build size(int size);
+		AutoIncrementOrBuild size(int size);
 	}
 	
 	/**
@@ -836,18 +920,7 @@ public class ColumnDefinition{
 		 * Sets size to the default for the data type
 		 * @return this, to continue building
 		 */
-		Build defaultSize();
-	}
-	
-	/**
-	 * The Size part of building a {@link ColumnDefinition}, allowing using a default size and using a long
-	 */
-	public interface AllowDefaultSizeLong extends AllowDefaultSize{
-		/**
-		 * @param size The size to use for the column
-		 * @return this, to continue building
-		 */
-		Build size(long size);
+		AutoIncrementOrBuild defaultSize();
 	}
 	
 	/**
@@ -859,13 +932,13 @@ public class ColumnDefinition{
 		 * @param digits The number of digits after the decimal
 		 * @return this, to continue building
 		 */
-		Build sizeAndDigits(int size, int digits);
+		AutoIncrementOrBuild sizeAndDigits(int size, int digits);
 		
 		/**
 		 * Sets to use the default size and digits for the data type
 		 * @return this, to continue building
 		 */
-		Build defaultSizeAndDigits();
+		AutoIncrementOrBuild defaultSizeAndDigits();
 	}
 	
 	/**
@@ -900,6 +973,17 @@ public class ColumnDefinition{
 		 * @return this, to continue building
 		 */
 		Build defaultFractionalSecondsPrecision();
+	}
+	
+	/**
+	 * The Auto-Incrementing part of building a {@link ColumnDefinition}
+	 */
+	public interface AutoIncrementOrBuild extends Build{
+		/**
+		 * Sets the column to auto-increment
+		 * @return this, to continue building
+		 */
+		Build autoIncrement();
 	}
 	
 	/**
