@@ -43,6 +43,17 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testDoubleUnsigned(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertTrue(doubleDef.isUnsigned());
+	}
+	
+	@Test
 	public void testDoubleAutoIncrement(){
 		doubleDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -92,6 +103,17 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDOUBLEUnsigned(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DOUBLE + " UNSIGNED", doubleDef.toString());
+	}
+	
+	@Test
 	public void testToStringDOUBLEAutoIncrement(){
 		doubleDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -108,9 +130,10 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.doubleType()
 				.sizeAndDigits(size, digits)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.DOUBLE + "(" + size + ", " + digits + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.DOUBLE + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
 				doubleDef.toString());
 	}
 }

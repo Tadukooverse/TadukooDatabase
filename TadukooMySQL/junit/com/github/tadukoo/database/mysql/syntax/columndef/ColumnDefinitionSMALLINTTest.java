@@ -42,6 +42,17 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testSmallintUnsigned(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.size(size)
+				.unsigned()
+				.build();
+		assertTrue(smallintDef.isUnsigned());
+	}
+	
+	@Test
 	public void testSmallintAutoIncrement(){
 		smallintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -137,6 +148,17 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringSMALLINTUnsigned(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SMALLINT + " UNSIGNED", smallintDef.toString());
+	}
+	
+	@Test
 	public void testToStringSMALLINTAutoIncrement(){
 		smallintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -153,9 +175,10 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.smallint()
 				.size(size)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.SMALLINT + "(" + size + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.SMALLINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
 				smallintDef.toString());
 	}
 }

@@ -55,6 +55,11 @@ public class ColumnDefinition{
 	 *         <td>Required for some data types - otherwise defaults to -1</td>
 	 *     </tr>
 	 *     <tr>
+	 *         <td>unsigned</td>
+	 *         <td>Whether this column is unsigned (true) or signed (false)</td>
+	 *         <td>Defaults to signed (false)</td>
+	 *     </tr>
+	 *     <tr>
 	 *         <td>autoIncrement</td>
 	 *         <td>Whether to auto-increment the column or not</td>
 	 *         <td>Defaults to false</td>
@@ -66,7 +71,7 @@ public class ColumnDefinition{
 	 */
 	public static class ColumnDefinitionBuilder implements ColumnName, DataType, Length, AllowDefaultLength,
 			AllowDefaultLengthLong, Size, AllowDefaultSize, SizeAndDigits, Values, FractionalSecondsPrecision,
-			AutoIncrementOrBuild, Build{
+			NumericTypesOrBuild, Build{
 		/** The name to use for the column */
 		private String columnName;
 		/** The {@link SQLDataType data type} of the column */
@@ -79,6 +84,8 @@ public class ColumnDefinition{
 		private Integer digits = null;
 		/** The precision for fractional seconds */
 		private Integer fractionalSecondsPrecision = null;
+		/** Whether this column is unsigned (true) or signed (false) */
+		private boolean unsigned = false;
 		/** Whether to auto-increment the column or not */
 		private boolean autoIncrement = false;
 		
@@ -326,21 +333,21 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public AutoIncrementOrBuild size(int size){
+		public NumericTypesOrBuild size(int size){
 			this.size = Integer.valueOf(size).longValue();
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public AutoIncrementOrBuild defaultSize(){
+		public NumericTypesOrBuild defaultSize(){
 			// Don't set size (keep null to use default)
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public AutoIncrementOrBuild sizeAndDigits(int size, int digits){
+		public NumericTypesOrBuild sizeAndDigits(int size, int digits){
 			this.size = Integer.valueOf(size).longValue();
 			this.digits = digits;
 			return this;
@@ -348,7 +355,7 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public AutoIncrementOrBuild defaultSizeAndDigits(){
+		public NumericTypesOrBuild defaultSizeAndDigits(){
 			// Don't set size and digits (keep null to use defaults)
 			return this;
 		}
@@ -387,7 +394,14 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build autoIncrement(){
+		public NumericTypesOrBuild unsigned(){
+			this.unsigned = true;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericTypesOrBuild autoIncrement(){
 			this.autoIncrement = true;
 			return this;
 		}
@@ -481,7 +495,7 @@ public class ColumnDefinition{
 			checkForErrors();
 			
 			return new ColumnDefinition(columnName, dataType, size, values, digits, fractionalSecondsPrecision,
-					autoIncrement);
+					unsigned, autoIncrement);
 		}
 	}
 	
@@ -497,6 +511,8 @@ public class ColumnDefinition{
 	private final Integer digits;
 	/** The precision for fractional seconds */
 	private final Integer fractionalSecondsPrecision;
+	/** Whether this column is unsigned (true) or signed (false) */
+	private final boolean unsigned;
 	/** Whether to auto-increment this column or not */
 	private final boolean autoIncrement;
 	
@@ -509,18 +525,20 @@ public class ColumnDefinition{
 	 * @param values The possible values for the column
 	 * @param digits The number of digits after the decimal
 	 * @param fractionalSecondsPrecision The precision for fractional seconds
+	 * @param unsigned Whether this column is unsigned (true) or signed (false)
 	 * @param autoIncrement Whether to auto-increment this column or not
 	 */
 	private ColumnDefinition(
 			String columnName, SQLDataType dataType,
 			Long size, List<String> values, Integer digits, Integer fractionalSecondsPrecision,
-			boolean autoIncrement){
+			boolean unsigned, boolean autoIncrement){
 		this.columnName = columnName;
 		this.dataType = dataType;
 		this.size = size;
 		this.values = values;
 		this.digits = digits;
 		this.fractionalSecondsPrecision = fractionalSecondsPrecision;
+		this.unsigned = unsigned;
 		this.autoIncrement = autoIncrement;
 	}
 	
@@ -574,6 +592,13 @@ public class ColumnDefinition{
 	}
 	
 	/**
+	 * @return Whether this column is unsigned (true) or signed (false)
+	 */
+	public boolean isUnsigned(){
+		return unsigned;
+	}
+	
+	/**
 	 * @return Whether to auto-increment this column or not
 	 */
 	public boolean isAutoIncremented(){
@@ -611,6 +636,11 @@ public class ColumnDefinition{
 		// Check if we have FSP
 		if(fractionalSecondsPrecision != null){
 			colDef.append('(').append(fractionalSecondsPrecision).append(')');
+		}
+		
+		// Add unsigned if we have it
+		if(unsigned){
+			colDef.append(" UNSIGNED");
 		}
 		
 		// Add auto-increment if we have it
@@ -909,7 +939,7 @@ public class ColumnDefinition{
 		 * @param size The length of the column
 		 * @return this, to continue building
 		 */
-		AutoIncrementOrBuild size(int size);
+		NumericTypesOrBuild size(int size);
 	}
 	
 	/**
@@ -920,7 +950,7 @@ public class ColumnDefinition{
 		 * Sets size to the default for the data type
 		 * @return this, to continue building
 		 */
-		AutoIncrementOrBuild defaultSize();
+		NumericTypesOrBuild defaultSize();
 	}
 	
 	/**
@@ -932,13 +962,13 @@ public class ColumnDefinition{
 		 * @param digits The number of digits after the decimal
 		 * @return this, to continue building
 		 */
-		AutoIncrementOrBuild sizeAndDigits(int size, int digits);
+		NumericTypesOrBuild sizeAndDigits(int size, int digits);
 		
 		/**
 		 * Sets to use the default size and digits for the data type
 		 * @return this, to continue building
 		 */
-		AutoIncrementOrBuild defaultSizeAndDigits();
+		NumericTypesOrBuild defaultSizeAndDigits();
 	}
 	
 	/**
@@ -976,14 +1006,20 @@ public class ColumnDefinition{
 	}
 	
 	/**
-	 * The Auto-Incrementing part of building a {@link ColumnDefinition}
+	 * The Unsigned/Auto-Incrementing part of building a {@link ColumnDefinition}
 	 */
-	public interface AutoIncrementOrBuild extends Build{
+	public interface NumericTypesOrBuild extends Build{
+		/**
+		 * Sets the column as unsigned
+		 * @return this, to continue building
+		 */
+		NumericTypesOrBuild unsigned();
+		
 		/**
 		 * Sets the column to auto-increment
 		 * @return this, to continue building
 		 */
-		Build autoIncrement();
+		NumericTypesOrBuild autoIncrement();
 	}
 	
 	/**

@@ -43,6 +43,17 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testDecimalUnsigned(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertTrue(decimalDef.isUnsigned());
+	}
+	
+	@Test
 	public void testDecimalAutoIncrement(){
 		decimalDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -169,6 +180,17 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDECIMALUnsigned(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DECIMAL + " UNSIGNED", decimalDef.toString());
+	}
+	
+	@Test
 	public void testToStringDECIMALAutoIncrement(){
 		decimalDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -185,9 +207,10 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.decimal()
 				.sizeAndDigits(size, digits)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.DECIMAL + "(" + size + ", " + digits + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.DECIMAL + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
 				decimalDef.toString());
 	}
 }

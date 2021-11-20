@@ -42,6 +42,17 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testIntegerUnsigned(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.size(size)
+				.unsigned()
+				.build();
+		assertTrue(integerDef.isUnsigned());
+	}
+	
+	@Test
 	public void testIntegerAutoIncrement(){
 		integerDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -137,6 +148,17 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringINTEGERUnsigned(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.INTEGER + " UNSIGNED", integerDef.toString());
+	}
+	
+	@Test
 	public void testToStringINTEGERAutoIncrement(){
 		integerDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -153,9 +175,10 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.integer()
 				.size(size)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.INTEGER + "(" + size + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.INTEGER + "(" + size + ") UNSIGNED AUTO_INCREMENT",
 				integerDef.toString());
 	}
 }

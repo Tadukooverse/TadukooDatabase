@@ -42,6 +42,17 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testTinyintUnsigned(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertTrue(tinyintDef.isUnsigned());
+	}
+	
+	@Test
 	public void testTinyintAutoIncrement(){
 		tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -137,6 +148,17 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringTINYINTUnsigned(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYINT + " UNSIGNED", tinyintDef.toString());
+	}
+	
+	@Test
 	public void testToStringTINYINTAutoIncrement(){
 		tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -153,9 +175,10 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.tinyint()
 				.size(size)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.TINYINT + "(" + size + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.TINYINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
 				tinyintDef.toString());
 	}
 }

@@ -43,6 +43,17 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testFloatUnsigned(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertTrue(floatDef.isUnsigned());
+	}
+	
+	@Test
 	public void testFloatAutoIncrement(){
 		floatDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -92,6 +103,17 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringFLOATUnsigned(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.FLOAT + " UNSIGNED", floatDef.toString());
+	}
+	
+	@Test
 	public void testToStringFLOATAutoIncrement(){
 		floatDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -108,9 +130,10 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.floatType()
 				.sizeAndDigits(size, digits)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.FLOAT + "(" + size + ", " + digits + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.FLOAT + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
 				floatDef.toString());
 	}
 }

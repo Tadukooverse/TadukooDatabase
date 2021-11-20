@@ -79,6 +79,17 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testSetUnsigned(){
+		ColumnDefinition tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.size(size)
+				.unsigned()
+				.build();
+		assertTrue(tinyintDef.isUnsigned());
+	}
+	
+	@Test
 	public void testSetAutoIncrement(){
 		ColumnDefinition tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -113,6 +124,11 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	@Test
 	public void testDefaultFractionalSecondsPrecision(){
 		assertNull(charDef.getFractionalSecondsPrecision());
+	}
+	
+	@Test
+	public void testDefaultUnsigned(){
+		assertFalse(charDef.isUnsigned());
 	}
 	
 	@Test

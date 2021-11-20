@@ -42,6 +42,17 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testMediumintUnsigned(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.size(size)
+				.unsigned()
+				.build();
+		assertTrue(mediumintDef.isUnsigned());
+	}
+	
+	@Test
 	public void testMediumintAutoIncrement(){
 		mediumintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -137,6 +148,17 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringMEDIUMINTUnsigned(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + " UNSIGNED" , mediumintDef.toString());
+	}
+	
+	@Test
 	public void testToStringMEDIUMINTAutoIncrement(){
 		mediumintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -153,9 +175,10 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.mediumint()
 				.size(size)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + "(" + size + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
 				mediumintDef.toString());
 	}
 }

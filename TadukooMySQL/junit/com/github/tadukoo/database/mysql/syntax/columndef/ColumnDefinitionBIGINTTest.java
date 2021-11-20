@@ -42,6 +42,17 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testBigintUnsigned(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertTrue(bigintDef.isUnsigned());
+	}
+	
+	@Test
 	public void testBigintAutoIncrement(){
 		bigintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -137,6 +148,17 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringBIGINTUnsigned(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.defaultSize()
+				.unsigned()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIGINT + " UNSIGNED", bigintDef.toString());
+	}
+	
+	@Test
 	public void testToStringBIGINTAutoIncrement(){
 		bigintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -153,9 +175,10 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 				.columnName(columnName)
 				.bigint()
 				.size(size)
+				.unsigned()
 				.autoIncrement()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.BIGINT + "(" + size + ") AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.BIGINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
 				bigintDef.toString());
 	}
 }
