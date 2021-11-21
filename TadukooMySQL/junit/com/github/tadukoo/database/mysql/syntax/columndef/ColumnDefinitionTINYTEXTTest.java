@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionTINYTEXTTest implements ColumnDefinitionConstants{
@@ -26,6 +27,26 @@ public class ColumnDefinitionTINYTEXTTest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetTinytext(){
 		assertEquals(SQLDataType.TINYTEXT, tinytextDef.getDataType());
+	}
+	
+	@Test
+	public void testTinytextNotNull(){
+		tinytextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinytext()
+				.notNull()
+				.build();
+		assertTrue(tinytextDef.isNotNull());
+	}
+	
+	@Test
+	public void testTinytextPrimaryKey(){
+		tinytextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinytext()
+				.primaryKey()
+				.build();
+		assertTrue(tinytextDef.isPrimaryKey());
 	}
 	
 	/*
@@ -53,5 +74,36 @@ public class ColumnDefinitionTINYTEXTTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringTINYTEXT(){
 		assertEquals(columnName + " " + SQLDataType.TINYTEXT, tinytextDef.toString());
+	}
+	
+	@Test
+	public void testToStringTINYTEXTNotNull(){
+		tinytextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinytext()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYTEXT + " NOT NULL", tinytextDef.toString());
+	}
+	
+	@Test
+	public void testToStringTINYTEXTPrimaryKey(){
+		tinytextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinytext()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYTEXT + " PRIMARY KEY", tinytextDef.toString());
+	}
+	
+	@Test
+	public void testToStringTINYTEXTAll(){
+		tinytextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinytext()
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYTEXT + " NOT NULL PRIMARY KEY", tinytextDef.toString());
 	}
 }

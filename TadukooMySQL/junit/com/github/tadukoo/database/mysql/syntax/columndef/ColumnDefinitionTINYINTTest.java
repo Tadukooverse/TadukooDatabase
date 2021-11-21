@@ -42,6 +42,17 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testTinyintNotNull(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertTrue(tinyintDef.isNotNull());
+	}
+	
+	@Test
 	public void testTinyintUnsigned(){
 		tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -61,6 +72,17 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(tinyintDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testTinyintPrimaryKey(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.size(size)
+				.primaryKey()
+				.build();
+		assertTrue(tinyintDef.isPrimaryKey());
 	}
 	
 	/*
@@ -148,6 +170,17 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testtoStringTINYINTNotNull(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYINT + " NOT NULL", tinyintDef.toString());
+	}
+	
+	@Test
 	public void testToStringTINYINTUnsigned(){
 		tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -170,15 +203,29 @@ public class ColumnDefinitionTINYINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringTINYINTPrimaryKey(){
+		tinyintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.tinyint()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TINYINT + " PRIMARY KEY", tinyintDef.toString());
+	}
+	
+	@Test
 	public void testToStringTINYINTAll(){
 		tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.tinyint()
 				.size(size)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.TINYINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.TINYINT + "(" + size + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				tinyintDef.toString());
 	}
 }

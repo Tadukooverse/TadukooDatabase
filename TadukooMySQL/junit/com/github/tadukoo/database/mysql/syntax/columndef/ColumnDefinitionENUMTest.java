@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionENUMTest implements ColumnDefinitionConstants{
@@ -45,6 +46,28 @@ public class ColumnDefinitionENUMTest implements ColumnDefinitionConstants{
 		assertEquals(2, values.size());
 		assertEquals("Derp", values.get(0));
 		assertEquals("Plop", values.get(1));
+	}
+	
+	@Test
+	public void testEnumNotNull(){
+		enumDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.enumeration()
+				.values(values)
+				.notNull()
+				.build();
+		assertTrue(enumDef.isNotNull());
+	}
+	
+	@Test
+	public void testEnumPrimaryKey(){
+		enumDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.enumeration()
+				.values(values)
+				.primaryKey()
+				.build();
+		assertTrue(enumDef.isPrimaryKey());
 	}
 	
 	/*
@@ -123,5 +146,41 @@ public class ColumnDefinitionENUMTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringENUM(){
 		assertEquals(columnName + " " + SQLDataType.ENUM + "(" + valuesString + ")", enumDef.toString());
+	}
+	
+	@Test
+	public void testToStringENUMNotNull(){
+		enumDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.enumeration()
+				.values(values)
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.ENUM + "(" + valuesString + ") NOT NULL", enumDef.toString());
+	}
+	
+	@Test
+	public void testToStringENUMPrimaryKey(){
+		enumDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.enumeration()
+				.values(values)
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.ENUM + "(" + valuesString + ") PRIMARY KEY",
+				enumDef.toString());
+	}
+	
+	@Test
+	public void testToStringENUMAll(){
+		enumDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.enumeration()
+				.values(values)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.ENUM + "(" + valuesString + ") NOT NULL PRIMARY KEY",
+				enumDef.toString());
 	}
 }

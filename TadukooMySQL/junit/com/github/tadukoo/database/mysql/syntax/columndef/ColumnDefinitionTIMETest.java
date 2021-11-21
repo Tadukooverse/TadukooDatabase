@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionTIMETest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionTIMETest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertNull(timeDef.getFractionalSecondsPrecision());
+	}
+	
+	@Test
+	public void testTimeNotNull(){
+		timeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.time()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertTrue(timeDef.isNotNull());
+	}
+	
+	@Test
+	public void testTimePrimaryKey(){
+		timeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.time()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertTrue(timeDef.isPrimaryKey());
 	}
 	
 	/*
@@ -125,5 +148,40 @@ public class ColumnDefinitionTIMETest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.TIME, timeDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMENotNull(){
+		timeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.time()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIME + " NOT NULL", timeDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMEPrimaryKey(){
+		timeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.time()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIME + " PRIMARY KEY", timeDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMEAll(){
+		timeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.time()
+				.fractionalSecondsPrecision(fractionalSecondsPrecision)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIME + "(" + fractionalSecondsPrecision + ") " +
+				"NOT NULL PRIMARY KEY", timeDef.toString());
 	}
 }

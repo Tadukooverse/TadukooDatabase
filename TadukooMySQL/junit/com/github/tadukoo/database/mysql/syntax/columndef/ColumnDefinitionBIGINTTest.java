@@ -42,6 +42,17 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testNotNull(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertTrue(bigintDef.isNotNull());
+	}
+	
+	@Test
 	public void testBigintUnsigned(){
 		bigintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -61,6 +72,17 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(bigintDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testBigintPrimaryKey(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.size(size)
+				.primaryKey()
+				.build();
+		assertTrue(bigintDef.isPrimaryKey());
 	}
 	
 	/*
@@ -148,6 +170,17 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringBIGINTNotNull(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIGINT + " NOT NULL", bigintDef.toString());
+	}
+	
+	@Test
 	public void testToStringBIGINTUnsigned(){
 		bigintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -170,15 +203,29 @@ public class ColumnDefinitionBIGINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringBIGINTPrimaryKey(){
+		bigintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bigint()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIGINT + " PRIMARY KEY", bigintDef.toString());
+	}
+	
+	@Test
 	public void testToStringBIGINTAll(){
 		bigintDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.bigint()
 				.size(size)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.BIGINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.BIGINT + "(" + size + ") NOT NULL UNSIGNED " +
+						"AUTO_INCREMENT PRIMARY KEY",
 				bigintDef.toString());
 	}
 }

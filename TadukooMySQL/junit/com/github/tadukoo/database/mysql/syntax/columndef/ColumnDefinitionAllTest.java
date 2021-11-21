@@ -79,6 +79,17 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testSetNotNull(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.length(size)
+				.notNull()
+				.build();
+		assertTrue(charDef.isNotNull());
+	}
+	
+	@Test
 	public void testSetUnsigned(){
 		ColumnDefinition tinyintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -98,6 +109,17 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(tinyintDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testSetPrimaryKey(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(charDef.isPrimaryKey());
 	}
 	
 	/*
@@ -127,6 +149,11 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testDefaultNotNull(){
+		assertFalse(charDef.isNotNull());
+	}
+	
+	@Test
 	public void testDefaultUnsigned(){
 		assertFalse(charDef.isUnsigned());
 	}
@@ -134,6 +161,11 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	@Test
 	public void testDefaultAutoIncrement(){
 		assertFalse(charDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testDefaultPrimaryKey(){
+		assertFalse(charDef.isPrimaryKey());
 	}
 	
 	/*

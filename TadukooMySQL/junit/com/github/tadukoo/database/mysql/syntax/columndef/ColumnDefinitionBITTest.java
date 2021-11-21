@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionBITTest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionBITTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertNull(bitDef.getSize());
+	}
+	
+	@Test
+	public void testBitNotNull(){
+		bitDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bit()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertTrue(bitDef.isNotNull());
+	}
+	
+	@Test
+	public void testBitPrimaryKey(){
+		bitDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bit()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertTrue(bitDef.isPrimaryKey());
 	}
 	
 	/*
@@ -122,5 +145,40 @@ public class ColumnDefinitionBITTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.BIT, bitDef.toString());
+	}
+	
+	@Test
+	public void testToStringBITNotNull(){
+		bitDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bit()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIT + " NOT NULL", bitDef.toString());
+	}
+	
+	@Test
+	public void testToStringBITPrimaryKey(){
+		bitDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bit()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIT + " PRIMARY KEY", bitDef.toString());
+	}
+	
+	@Test
+	public void testToStringBITAll(){
+		bitDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.bit()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BIT + "(" + size + ") NOT NULL PRIMARY KEY",
+				bitDef.toString());
 	}
 }

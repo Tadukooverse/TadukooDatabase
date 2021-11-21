@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionMEDIUMBLOBTest implements ColumnDefinitionConstants{
@@ -26,6 +27,26 @@ public class ColumnDefinitionMEDIUMBLOBTest implements ColumnDefinitionConstants
 	@Test
 	public void testSetMediumblob(){
 		assertEquals(SQLDataType.MEDIUMBLOB, mediumblobDef.getDataType());
+	}
+	
+	@Test
+	public void testSetMediumblobNotNull(){
+		mediumblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumblob()
+				.notNull()
+				.build();
+		assertTrue(mediumblobDef.isNotNull());
+	}
+	
+	@Test
+	public void testSetMediumblobPrimaryKey(){
+		mediumblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumblob()
+				.primaryKey()
+				.build();
+		assertTrue(mediumblobDef.isPrimaryKey());
 	}
 	
 	/*
@@ -53,5 +74,37 @@ public class ColumnDefinitionMEDIUMBLOBTest implements ColumnDefinitionConstants
 	@Test
 	public void testToStringMEDIUMBLOB(){
 		assertEquals(columnName + " " + SQLDataType.MEDIUMBLOB, mediumblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringMEDIUMBLOBNotNull(){
+		mediumblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumblob()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMBLOB + " NOT NULL", mediumblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringMEDIUMBLOBPrimaryKey(){
+		mediumblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumblob()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMBLOB + " PRIMARY KEY", mediumblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringMEDIUMBLOBAll(){
+		mediumblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumblob()
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMBLOB + " NOT NULL PRIMARY KEY",
+				mediumblobDef.toString());
 	}
 }

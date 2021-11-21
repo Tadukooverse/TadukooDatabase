@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionBLOBTest implements ColumnDefinitionConstants{
@@ -49,6 +50,28 @@ public class ColumnDefinitionBLOBTest implements ColumnDefinitionConstants{
 				.length(sizeL)
 				.build();
 		assertEquals(sizeL, blobDef.getSize());
+	}
+	
+	@Test
+	public void testBlobNotNull(){
+		blobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.blob()
+				.length(size)
+				.notNull()
+				.build();
+		assertTrue(blobDef.isNotNull());
+	}
+	
+	@Test
+	public void testBlobPrimaryKey(){
+		blobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.blob()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(blobDef.isPrimaryKey());
 	}
 	
 	/*
@@ -133,5 +156,40 @@ public class ColumnDefinitionBLOBTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.BLOB, blobDef.toString());
+	}
+	
+	@Test
+	public void testToStringBLOBNotNull(){
+		blobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.blob()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BLOB + " NOT NULL", blobDef.toString());
+	}
+	
+	@Test
+	public void testToStringBLOBPrimaryKey(){
+		blobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.blob()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BLOB + " PRIMARY KEY", blobDef.toString());
+	}
+	
+	@Test
+	public void testToStringBLOBAll(){
+		blobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.blob()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BLOB + "(" + size + ") NOT NULL PRIMARY KEY",
+				blobDef.toString());
 	}
 }

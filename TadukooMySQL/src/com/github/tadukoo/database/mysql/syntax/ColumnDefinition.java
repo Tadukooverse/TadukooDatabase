@@ -55,6 +55,11 @@ public class ColumnDefinition{
 	 *         <td>Required for some data types - otherwise defaults to -1</td>
 	 *     </tr>
 	 *     <tr>
+	 *         <td>notNull</td>
+	 *         <td>Whether this column allows null (false) or not (true)</td>
+	 *         <td>Defaults to false (allowing null)</td>
+	 *     </tr>
+	 *     <tr>
 	 *         <td>unsigned</td>
 	 *         <td>Whether this column is unsigned (true) or signed (false)</td>
 	 *         <td>Defaults to signed (false)</td>
@@ -64,14 +69,18 @@ public class ColumnDefinition{
 	 *         <td>Whether to auto-increment the column or not</td>
 	 *         <td>Defaults to false</td>
 	 *     </tr>
+	 *     <tr>
+	 *         <td>primaryKey</td>
+	 *         <td>Whether this column is the primary key or not</td>
+	 *         <td>Defaults to false</td>
+	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
 	public static class ColumnDefinitionBuilder implements ColumnName, DataType, Length, AllowDefaultLength,
-			AllowDefaultLengthLong, Size, AllowDefaultSize, SizeAndDigits, Values, FractionalSecondsPrecision,
-			NumericTypesOrBuild, Build{
+			AllowDefaultLengthLong, Size, AllowDefaultSize, SizeAndDigits, Values, FractionalSecondsPrecision{
 		/** The name to use for the column */
 		private String columnName;
 		/** The {@link SQLDataType data type} of the column */
@@ -84,10 +93,6 @@ public class ColumnDefinition{
 		private Integer digits = null;
 		/** The precision for fractional seconds */
 		private Integer fractionalSecondsPrecision = null;
-		/** Whether this column is unsigned (true) or signed (false) */
-		private boolean unsigned = false;
-		/** Whether to auto-increment the column or not */
-		private boolean autoIncrement = false;
 		
 		/** Not allowed to instantiate outside of {@link ColumnDefinition} */
 		private ColumnDefinitionBuilder(){ }
@@ -133,16 +138,16 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build tinyblob(){
+		public NormalEnding tinyblob(){
 			this.dataType = SQLDataType.TINYBLOB;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build tinytext(){
+		public NormalEnding tinytext(){
 			this.dataType = SQLDataType.TINYTEXT;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
@@ -161,30 +166,30 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build mediumtext(){
+		public NormalEnding mediumtext(){
 			this.dataType = SQLDataType.MEDIUMTEXT;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build mediumblob(){
+		public NormalEnding mediumblob(){
 			this.dataType = SQLDataType.MEDIUMBLOB;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build longtext(){
+		public NormalEnding longtext(){
 			this.dataType = SQLDataType.LONGTEXT;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build longblob(){
+		public NormalEnding longblob(){
 			this.dataType = SQLDataType.LONGBLOB;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
@@ -217,9 +222,9 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build bool(){
+		public NormalEnding bool(){
 			this.dataType = SQLDataType.BOOL;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
@@ -273,9 +278,9 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build date(){
+		public NormalEnding date(){
 			this.dataType = SQLDataType.DATE;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
@@ -301,9 +306,9 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build year(){
+		public NormalEnding year(){
 			this.dataType = SQLDataType.YEAR;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/*
@@ -312,97 +317,154 @@ public class ColumnDefinition{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build length(int length){
+		public NormalEnding length(int length){
 			this.size = Integer.valueOf(length).longValue();
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build defaultLength(){
+		public NormalEnding defaultLength(){
 			// Don't set size (keep null to use default)
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build length(long length){
+		public NormalEnding length(long length){
 			this.size = length;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild size(int size){
+		public NumericEnding size(int size){
 			this.size = Integer.valueOf(size).longValue();
-			return this;
+			return createNumericEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild defaultSize(){
+		public NumericEnding defaultSize(){
 			// Don't set size (keep null to use default)
-			return this;
+			return createNumericEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild sizeAndDigits(int size, int digits){
+		public NumericEnding sizeAndDigits(int size, int digits){
 			this.size = Integer.valueOf(size).longValue();
 			this.digits = digits;
-			return this;
+			return createNumericEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild defaultSizeAndDigits(){
+		public NumericEnding defaultSizeAndDigits(){
 			// Don't set size and digits (keep null to use defaults)
-			return this;
+			return createNumericEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build values(List<String> values){
+		public NormalEnding values(List<String> values){
 			this.values = values;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build values(String ... values){
+		public NormalEnding values(String ... values){
 			this.values = ListUtil.createList(values);
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build fractionalSecondsPrecision(int fractionalSecondsPrecision){
+		public NormalEnding fractionalSecondsPrecision(int fractionalSecondsPrecision){
 			this.fractionalSecondsPrecision = fractionalSecondsPrecision;
-			return this;
+			return createNormalEnding();
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build defaultFractionalSecondsPrecision(){
+		public NormalEnding defaultFractionalSecondsPrecision(){
 			// Don't set fractional seconds precision (keep null to use default)
-			return this;
+			return createNormalEnding();
 		}
 		
 		/*
-		 * Special Conditions
+		 * Endings
 		 */
+		
+		/**
+		 * @return A normal ending to continue building this for non-numeric data types
+		 */
+		private Builder createNormalEnding(){
+			return new Builder(this);
+		}
+		
+		/**
+		 * @return A numeric ending to continue building this for numeric data types
+		 */
+		private NumericEnding createNumericEnding(){
+			return new NumericColumnDefinitionBuilder(this);
+		}
+	}
+	
+	/**
+	 * A builder class for non-numeric column definitions
+	 *
+	 * @author Logan Ferree (Tadukoo)
+	 * @version Alpha v.0.3
+	 */
+	public static class Builder implements NormalEnding{
+		/** The name to use for the column */
+		protected final String columnName;
+		/** The {@link SQLDataType data type} of the column */
+		protected final SQLDataType dataType;
+		/** The length of the column or total number of digits */
+		protected final Long size;
+		/** The possible values for the column */
+		protected final List<String> values;
+		/** The number of digits after the decimal */
+		protected final Integer digits;
+		/** The precision for fractional seconds */
+		protected final Integer fractionalSecondsPrecision;
+		/** Whether this column allows null (false) or not (true) */
+		protected boolean notNull = false;
+		/** Whether this column is unsigned (true) or signed (false) */
+		protected boolean unsigned = false;
+		/** Whether to auto-increment the column or not */
+		protected boolean autoIncrement = false;
+		/** Whether this column is the primary key or not */
+		protected boolean primaryKey = false;
+		
+		/**
+		 * Creates a new Builder using the given parameters from the {@link ColumnDefinitionBuilder}
+		 *
+		 * @param builder The {@link ColumnDefinitionBuilder} to use for values
+		 */
+		protected Builder(ColumnDefinitionBuilder builder){
+			this.columnName = builder.columnName;
+			this.dataType = builder.dataType;
+			this.size = builder.size;
+			this.values = builder.values;
+			this.digits = builder.digits;
+			this.fractionalSecondsPrecision = builder.fractionalSecondsPrecision;
+		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild unsigned(){
-			this.unsigned = true;
+		public NormalEnding notNull(){
+			this.notNull = true;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public NumericTypesOrBuild autoIncrement(){
-			this.autoIncrement = true;
+		public NormalEnding primaryKey(){
+			this.primaryKey = true;
 			return this;
 		}
 		
@@ -495,7 +557,52 @@ public class ColumnDefinition{
 			checkForErrors();
 			
 			return new ColumnDefinition(columnName, dataType, size, values, digits, fractionalSecondsPrecision,
-					unsigned, autoIncrement);
+					notNull, unsigned, autoIncrement, primaryKey);
+		}
+	}
+	
+	/**
+	 * A builder class to use for numeric column definitions
+	 *
+	 * @author Logan Ferree (Tadukoo)
+	 * @version Alpha v.0.3
+	 */
+	public static class NumericColumnDefinitionBuilder extends Builder implements NumericEnding{
+		
+		/**
+		 * Creates a new Numeric Column Definition Builder using the values from the given
+		 * {@link ColumnDefinitionBuilder}
+		 *
+		 * @param builder The {@link ColumnDefinitionBuilder} to use for values
+		 */
+		private NumericColumnDefinitionBuilder(ColumnDefinitionBuilder builder){
+			super(builder);
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericEnding notNull(){
+			return (NumericEnding) super.notNull();
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericEnding unsigned(){
+			this.unsigned = true;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericEnding autoIncrement(){
+			this.autoIncrement = true;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericEnding primaryKey(){
+			return (NumericEnding) super.primaryKey();
 		}
 	}
 	
@@ -511,10 +618,14 @@ public class ColumnDefinition{
 	private final Integer digits;
 	/** The precision for fractional seconds */
 	private final Integer fractionalSecondsPrecision;
+	/** Whether this column allows null (false) or not (true) */
+	private final boolean notNull;
 	/** Whether this column is unsigned (true) or signed (false) */
 	private final boolean unsigned;
 	/** Whether to auto-increment this column or not */
 	private final boolean autoIncrement;
+	/** Whether this column is the primary key or not */
+	private final boolean primaryKey;
 	
 	/**
 	 * Constructs a new {@link ColumnDefinition} with the given parameters
@@ -525,21 +636,25 @@ public class ColumnDefinition{
 	 * @param values The possible values for the column
 	 * @param digits The number of digits after the decimal
 	 * @param fractionalSecondsPrecision The precision for fractional seconds
+	 * @param notNull Whether this column allows null (false) or not (true)
 	 * @param unsigned Whether this column is unsigned (true) or signed (false)
 	 * @param autoIncrement Whether to auto-increment this column or not
+	 * @param primaryKey Whether this column is the primary key or not
 	 */
 	private ColumnDefinition(
 			String columnName, SQLDataType dataType,
 			Long size, List<String> values, Integer digits, Integer fractionalSecondsPrecision,
-			boolean unsigned, boolean autoIncrement){
+			boolean notNull, boolean unsigned, boolean autoIncrement, boolean primaryKey){
 		this.columnName = columnName;
 		this.dataType = dataType;
 		this.size = size;
 		this.values = values;
 		this.digits = digits;
 		this.fractionalSecondsPrecision = fractionalSecondsPrecision;
+		this.notNull = notNull;
 		this.unsigned = unsigned;
 		this.autoIncrement = autoIncrement;
+		this.primaryKey = primaryKey;
 	}
 	
 	/**
@@ -592,6 +707,13 @@ public class ColumnDefinition{
 	}
 	
 	/**
+	 * @return Whether this column allows null (false) or not (true)
+	 */
+	public boolean isNotNull(){
+		return notNull;
+	}
+	
+	/**
 	 * @return Whether this column is unsigned (true) or signed (false)
 	 */
 	public boolean isUnsigned(){
@@ -603,6 +725,13 @@ public class ColumnDefinition{
 	 */
 	public boolean isAutoIncremented(){
 		return autoIncrement;
+	}
+	
+	/**
+	 * @return Whether this column is the primary key or not
+	 */
+	public boolean isPrimaryKey(){
+		return primaryKey;
 	}
 	
 	/** {@inheritDoc} */
@@ -638,6 +767,11 @@ public class ColumnDefinition{
 			colDef.append('(').append(fractionalSecondsPrecision).append(')');
 		}
 		
+		// Add not null if we have it
+		if(notNull){
+			colDef.append(" NOT NULL");
+		}
+		
 		// Add unsigned if we have it
 		if(unsigned){
 			colDef.append(" UNSIGNED");
@@ -646,6 +780,11 @@ public class ColumnDefinition{
 		// Add auto-increment if we have it
 		if(autoIncrement){
 			colDef.append(" AUTO_INCREMENT");
+		}
+		
+		// Add primary key if we have it
+		if(primaryKey){
+			colDef.append(" PRIMARY KEY");
 		}
 		
 		return colDef.toString();
@@ -707,14 +846,14 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		Build tinyblob();
+		NormalEnding tinyblob();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#TINYTEXT TINYTEXT}.
 		 *
 		 * @return this, to continue building
 		 */
-		Build tinytext();
+		NormalEnding tinytext();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#TEXT TEXT}.
@@ -737,28 +876,28 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		Build mediumtext();
+		NormalEnding mediumtext();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#MEDIUMBLOB MEDIUMBLOB}.
 		 *
 		 * @return this, to continue building
 		 */
-		Build mediumblob();
+		NormalEnding mediumblob();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#LONGTEXT LONGTEXT}.
 		 *
 		 * @return this, to continue building
 		 */
-		Build longtext();
+		NormalEnding longtext();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#LONGBLOB LONGBLOB}.
 		 *
 		 * @return this, to continue building
 		 */
-		Build longblob();
+		NormalEnding longblob();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#ENUM ENUM}.
@@ -797,7 +936,7 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		Build bool();
+		NormalEnding bool();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#SMALLINT SMALLINT}.
@@ -861,7 +1000,7 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		Build date();
+		NormalEnding date();
 		
 		/**
 		 * Sets the data type to {@link SQLDataType#DATETIME DATETIME}.
@@ -895,7 +1034,7 @@ public class ColumnDefinition{
 		 *
 		 * @return this, to continue building
 		 */
-		Build year();
+		NormalEnding year();
 	}
 	
 	/**
@@ -906,7 +1045,7 @@ public class ColumnDefinition{
 		 * @param length The length of the column
 		 * @return this, to continue building
 		 */
-		Build length(int length);
+		NormalEnding length(int length);
 	}
 	
 	/**
@@ -917,7 +1056,7 @@ public class ColumnDefinition{
 		 * Sets length to the default for the data type
 		 * @return this, to continue building
 		 */
-		Build defaultLength();
+		NormalEnding defaultLength();
 	}
 	
 	/**
@@ -928,7 +1067,7 @@ public class ColumnDefinition{
 		 * @param length The length to use for the column
 		 * @return this, to continue building
 		 */
-		Build length(long length);
+		NormalEnding length(long length);
 	}
 	
 	/**
@@ -939,7 +1078,7 @@ public class ColumnDefinition{
 		 * @param size The length of the column
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild size(int size);
+		NumericEnding size(int size);
 	}
 	
 	/**
@@ -950,7 +1089,7 @@ public class ColumnDefinition{
 		 * Sets size to the default for the data type
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild defaultSize();
+		NumericEnding defaultSize();
 	}
 	
 	/**
@@ -962,13 +1101,13 @@ public class ColumnDefinition{
 		 * @param digits The number of digits after the decimal
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild sizeAndDigits(int size, int digits);
+		NumericEnding sizeAndDigits(int size, int digits);
 		
 		/**
 		 * Sets to use the default size and digits for the data type
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild defaultSizeAndDigits();
+		NumericEnding defaultSizeAndDigits();
 	}
 	
 	/**
@@ -979,13 +1118,13 @@ public class ColumnDefinition{
 		 * @param values The possible values for the column
 		 * @return this, to continue building
 		 */
-		Build values(List<String> values);
+		NormalEnding values(List<String> values);
 		
 		/**
 		 * @param values The possible values for the column
 		 * @return this, to continue building
 		 */
-		Build values(String ... values);
+		NormalEnding values(String ... values);
 	}
 	
 	/**
@@ -996,34 +1135,59 @@ public class ColumnDefinition{
 		 * @param fractionalSecondsPrecision The precision for fractional seconds
 		 * @return this, to continue building
 		 */
-		Build fractionalSecondsPrecision(int fractionalSecondsPrecision);
+		NormalEnding fractionalSecondsPrecision(int fractionalSecondsPrecision);
 		
 		/**
 		 * Sets to use the default fractional seconds precision for the data type
 		 * @return this, to continue building
 		 */
-		Build defaultFractionalSecondsPrecision();
+		NormalEnding defaultFractionalSecondsPrecision();
 	}
 	
 	/**
-	 * The Unsigned/Auto-Incrementing part of building a {@link ColumnDefinition}
+	 * The normal ending part of building a {@link ColumnDefinition}
 	 */
-	public interface NumericTypesOrBuild extends Build{
+	public interface NormalEnding extends Build{
+		/**
+		 * Sets this column to not allow null values
+		 * @return this, to continue building
+		 */
+		NormalEnding notNull();
+		
+		/**
+		 * Sets this column as the primary key
+		 * @return this, to continue building
+		 */
+		NormalEnding primaryKey();
+	}
+	
+	/**
+	 * The numeric ending part of building a {@link ColumnDefinition}
+	 */
+	public interface NumericEnding extends NormalEnding{
+		/** {@inheritDoc} */
+		@Override
+		NumericEnding notNull();
+		
 		/**
 		 * Sets the column as unsigned
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild unsigned();
+		NumericEnding unsigned();
 		
 		/**
 		 * Sets the column to auto-increment
 		 * @return this, to continue building
 		 */
-		NumericTypesOrBuild autoIncrement();
+		NumericEnding autoIncrement();
+		
+		/** {@inheritDoc} */
+		@Override
+		NumericEnding primaryKey();
 	}
 	
 	/**
-	 * The building part of building a {@link ColumnDefinition}
+	 * The Building part of building a {@link ColumnDefinition}
 	 */
 	public interface Build{
 		/**

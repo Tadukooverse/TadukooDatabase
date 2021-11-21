@@ -42,6 +42,17 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testSmallintNotNull(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.size(size)
+				.notNull()
+				.build();
+		assertTrue(smallintDef.isNotNull());
+	}
+	
+	@Test
 	public void testSmallintUnsigned(){
 		smallintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -61,6 +72,17 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(smallintDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testSmallintPrimaryKey(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.size(size)
+				.primaryKey()
+				.build();
+		assertTrue(smallintDef.isPrimaryKey());
 	}
 	
 	/*
@@ -148,6 +170,17 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringSMALLINTNotNull(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SMALLINT + " NOT NULL", smallintDef.toString());
+	}
+	
+	@Test
 	public void testToStringSMALLINTUnsigned(){
 		smallintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -170,15 +203,29 @@ public class ColumnDefinitionSMALLINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringSMALLINTPrimaryKey(){
+		smallintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.smallint()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SMALLINT + " PRIMARY KEY", smallintDef.toString());
+	}
+	
+	@Test
 	public void testToStringSMALLINTAll(){
 		smallintDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.smallint()
 				.size(size)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.SMALLINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.SMALLINT + "(" + size + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				smallintDef.toString());
 	}
 }

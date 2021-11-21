@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionBINARYTest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionBINARYTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertNull(binaryDef.getSize());
+	}
+	
+	@Test
+	public void testBinaryNotNull(){
+		binaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.binary()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertTrue(binaryDef.isNotNull());
+	}
+	
+	@Test
+	public void testBinaryPrimaryKey(){
+		binaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.binary()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(binaryDef.isPrimaryKey());
 	}
 	
 	/*
@@ -122,5 +145,40 @@ public class ColumnDefinitionBINARYTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.BINARY, binaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringBINARYNotNull(){
+		binaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.binary()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BINARY + " NOT NULL", binaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringBINARYPrimaryKey(){
+		binaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.binary()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BINARY + " PRIMARY KEY", binaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringBINARYAll(){
+		binaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.binary()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.BINARY + "(" + size + ") NOT NULL PRIMARY KEY",
+				binaryDef.toString());
 	}
 }

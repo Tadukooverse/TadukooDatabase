@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionCHARTest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionCHARTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertNull(charDef.getSize());
+	}
+	
+	@Test
+	public void testCharNotNull(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertTrue(charDef.isNotNull());
+	}
+	
+	@Test
+	public void testCharPrimaryKey(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertTrue(charDef.isPrimaryKey());
 	}
 	
 	/*
@@ -122,5 +145,40 @@ public class ColumnDefinitionCHARTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.CHAR, charDef.toString());
+	}
+	
+	@Test
+	public void testToStringCHARNotNull(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.CHAR + " NOT NULL", charDef.toString());
+	}
+	
+	@Test
+	public void testToStringCHARPrimaryKey(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.CHAR + " PRIMARY KEY", charDef.toString());
+	}
+	
+	@Test
+	public void testToStringCHARAll(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.CHAR + "(" + size + ") NOT NULL PRIMARY KEY",
+				charDef.toString());
 	}
 }

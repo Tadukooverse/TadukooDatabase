@@ -43,6 +43,17 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testDecimalNotNull(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertTrue(decimalDef.isNotNull());
+	}
+	
+	@Test
 	public void testDecimalUnsigned(){
 		decimalDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -62,6 +73,17 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(decimalDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testDecimalPrimaryKey(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertTrue(decimalDef.isPrimaryKey());
 	}
 	
 	/*
@@ -180,6 +202,17 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDECIMALNotNull(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DECIMAL + " NOT NULL", decimalDef.toString());
+	}
+	
+	@Test
 	public void testToStringDECIMALUnsigned(){
 		decimalDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -202,15 +235,29 @@ public class ColumnDefinitionDECIMALTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDECIMALPrimaryKey(){
+		decimalDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.decimal()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DECIMAL + " PRIMARY KEY", decimalDef.toString());
+	}
+	
+	@Test
 	public void testToStringDECIMALAll(){
 		decimalDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.decimal()
 				.sizeAndDigits(size, digits)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.DECIMAL + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.DECIMAL + "(" + size + ", " + digits + ") NOT NULL " +
+						"UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				decimalDef.toString());
 	}
 }

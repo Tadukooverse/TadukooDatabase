@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionDATETest implements ColumnDefinitionConstants{
@@ -26,6 +27,26 @@ public class ColumnDefinitionDATETest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetDate(){
 		assertEquals(SQLDataType.DATE, dateDef.getDataType());
+	}
+	
+	@Test
+	public void testDateNotNull(){
+		dateDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.date()
+				.notNull()
+				.build();
+		assertTrue(dateDef.isNotNull());
+	}
+	
+	@Test
+	public void testDatePrimaryKey(){
+		dateDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.date()
+				.primaryKey()
+				.build();
+		assertTrue(dateDef.isPrimaryKey());
 	}
 	
 	/*
@@ -53,5 +74,36 @@ public class ColumnDefinitionDATETest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringDATE(){
 		assertEquals(columnName + " " + SQLDataType.DATE, dateDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATENotNull(){
+		dateDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.date()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATE + " NOT NULL", dateDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATEPrimaryKey(){
+		dateDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.date()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATE + " PRIMARY KEY", dateDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATEAll(){
+		dateDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.date()
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATE + " NOT NULL PRIMARY KEY", dateDef.toString());
 	}
 }

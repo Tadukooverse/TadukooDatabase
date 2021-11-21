@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionTEXTTest implements ColumnDefinitionConstants{
@@ -49,6 +50,28 @@ public class ColumnDefinitionTEXTTest implements ColumnDefinitionConstants{
 				.length(sizeL)
 				.build();
 		assertEquals(sizeL, textDef.getSize());
+	}
+	
+	@Test
+	public void testTextNotNull(){
+		textDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.text()
+				.length(size)
+				.notNull()
+				.build();
+		assertTrue(textDef.isNotNull());
+	}
+	
+	@Test
+	public void testTextPrimaryKey(){
+		textDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.text()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(textDef.isPrimaryKey());
 	}
 	
 	/*
@@ -133,5 +156,40 @@ public class ColumnDefinitionTEXTTest implements ColumnDefinitionConstants{
 				.defaultLength()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.TEXT, textDef.toString());
+	}
+	
+	@Test
+	public void testToStringTEXTNotNull(){
+		textDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.text()
+				.defaultLength()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TEXT + " NOT NULL", textDef.toString());
+	}
+	
+	@Test
+	public void testToStringTEXTPrimaryKey(){
+		textDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.text()
+				.defaultLength()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TEXT + " PRIMARY KEY", textDef.toString());
+	}
+	
+	@Test
+	public void testToStringTEXTAll(){
+		textDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.text()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TEXT + "(" + size + ") NOT NULL PRIMARY KEY",
+				textDef.toString());
 	}
 }

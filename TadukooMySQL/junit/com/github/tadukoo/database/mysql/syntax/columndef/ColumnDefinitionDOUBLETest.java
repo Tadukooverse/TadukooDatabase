@@ -43,6 +43,17 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testDoubleNotNull(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertTrue(doubleDef.isNotNull());
+	}
+	
+	@Test
 	public void testDoubleUnsigned(){
 		doubleDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -62,6 +73,17 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(doubleDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testDoublePrimaryKey(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertTrue(doubleDef.isPrimaryKey());
 	}
 	
 	/*
@@ -103,6 +125,17 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDOUBLENotNull(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DOUBLE + " NOT NULL", doubleDef.toString());
+	}
+	
+	@Test
 	public void testToStringDOUBLEUnsigned(){
 		doubleDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -125,15 +158,29 @@ public class ColumnDefinitionDOUBLETest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringDOUBLEPrimaryKey(){
+		doubleDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.doubleType()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DOUBLE + " PRIMARY KEY", doubleDef.toString());
+	}
+	
+	@Test
 	public void testToStringDOUBLEAll(){
 		doubleDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.doubleType()
 				.sizeAndDigits(size, digits)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.DOUBLE + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.DOUBLE + "(" + size + ", " + digits + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				doubleDef.toString());
 	}
 }

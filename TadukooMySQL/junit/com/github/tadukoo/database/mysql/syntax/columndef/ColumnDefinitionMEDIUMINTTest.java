@@ -42,6 +42,17 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testMediumintNotNull(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertTrue(mediumintDef.isNotNull());
+	}
+	
+	@Test
 	public void testMediumintUnsigned(){
 		mediumintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -61,6 +72,17 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(mediumintDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testMediumintPrimaryKey(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertTrue(mediumintDef.isPrimaryKey());
 	}
 	
 	/*
@@ -148,6 +170,17 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringMEDIUMINTNotNull(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + " NOT NULL", mediumintDef.toString());
+	}
+	
+	@Test
 	public void testToStringMEDIUMINTUnsigned(){
 		mediumintDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -170,15 +203,29 @@ public class ColumnDefinitionMEDIUMINTTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringMEDIUMINTPrimaryKey(){
+		mediumintDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.mediumint()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + " PRIMARY KEY", mediumintDef.toString());
+	}
+	
+	@Test
 	public void testToStringMEDIUMINTAll(){
 		mediumintDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.mediumint()
 				.size(size)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + "(" + size + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.MEDIUMINT + "(" + size + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				mediumintDef.toString());
 	}
 }

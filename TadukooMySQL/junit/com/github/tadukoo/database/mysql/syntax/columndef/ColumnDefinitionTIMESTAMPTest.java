@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionTIMESTAMPTest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionTIMESTAMPTest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertNull(timestampDef.getFractionalSecondsPrecision());
+	}
+	
+	@Test
+	public void testTimestampNotNull(){
+		timestampDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.timestamp()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertTrue(timestampDef.isNotNull());
+	}
+	
+	@Test
+	public void testTimestampPrimaryKey(){
+		timestampDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.timestamp()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertTrue(timestampDef.isPrimaryKey());
 	}
 	
 	/*
@@ -125,5 +148,40 @@ public class ColumnDefinitionTIMESTAMPTest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.TIMESTAMP, timestampDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMESTAMPNotNull(){
+		timestampDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.timestamp()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIMESTAMP + " NOT NULL", timestampDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMESTAMPPrimaryKey(){
+		timestampDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.timestamp()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIMESTAMP + " PRIMARY KEY", timestampDef.toString());
+	}
+	
+	@Test
+	public void testToStringTIMESTAMPAll(){
+		timestampDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.timestamp()
+				.fractionalSecondsPrecision(fractionalSecondsPrecision)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.TIMESTAMP + "(" + fractionalSecondsPrecision + ") " +
+				"NOT NULL PRIMARY KEY", timestampDef.toString());
 	}
 }

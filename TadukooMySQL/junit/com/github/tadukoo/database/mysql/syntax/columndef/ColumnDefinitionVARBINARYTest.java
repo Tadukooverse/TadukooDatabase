@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionVARBINARYTest implements ColumnDefinitionConstants{
@@ -27,6 +28,28 @@ public class ColumnDefinitionVARBINARYTest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetVarbinary(){
 		assertEquals(SQLDataType.VARBINARY, varbinaryDef.getDataType());
+	}
+	
+	@Test
+	public void testVarbinaryNotNull(){
+		varbinaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varbinary()
+				.length(size)
+				.notNull()
+				.build();
+		assertTrue(varbinaryDef.isNotNull());
+	}
+	
+	@Test
+	public void testVarbinaryPrimaryKey(){
+		varbinaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varbinary()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(varbinaryDef.isPrimaryKey());
 	}
 	
 	/*
@@ -101,5 +124,42 @@ public class ColumnDefinitionVARBINARYTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringVARBINARY(){
 		assertEquals(columnName + " " + SQLDataType.VARBINARY + "(" + size + ")", varbinaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARBINARYNotNull(){
+		varbinaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varbinary()
+				.length(size)
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARBINARY + "(" + size + ") NOT NULL",
+				varbinaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARBINARYPrimaryKey(){
+		varbinaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varbinary()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARBINARY + "(" + size + ") PRIMARY KEY",
+				varbinaryDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARBINARYAll(){
+		varbinaryDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varbinary()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARBINARY + "(" + size + ") NOT NULL PRIMARY KEY",
+				varbinaryDef.toString());
 	}
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionLONGTEXTTest implements ColumnDefinitionConstants{
@@ -26,6 +27,26 @@ public class ColumnDefinitionLONGTEXTTest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetLongtext(){
 		assertEquals(SQLDataType.LONGTEXT, longtextDef.getDataType());
+	}
+	
+	@Test
+	public void testSetLongtextNotNull(){
+		longtextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longtext()
+				.notNull()
+				.build();
+		assertTrue(longtextDef.isNotNull());
+	}
+	
+	@Test
+	public void testSetLongtextPrimaryKey(){
+		longtextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longtext()
+				.primaryKey()
+				.build();
+		assertTrue(longtextDef.isPrimaryKey());
 	}
 	
 	/*
@@ -53,5 +74,36 @@ public class ColumnDefinitionLONGTEXTTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringLONGTEXT(){
 		assertEquals(columnName + " " + SQLDataType.LONGTEXT, longtextDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGTEXTNotNull(){
+		longtextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longtext()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGTEXT + " NOT NULL", longtextDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGTEXTPrimaryKey(){
+		longtextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longtext()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGTEXT + " PRIMARY KEY", longtextDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGTEXTAll(){
+		longtextDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longtext()
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGTEXT + " NOT NULL PRIMARY KEY", longtextDef.toString());
 	}
 }

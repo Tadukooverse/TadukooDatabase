@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionVARCHARTest implements ColumnDefinitionConstants{
@@ -27,6 +28,28 @@ public class ColumnDefinitionVARCHARTest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetVarchar(){
 		assertEquals(SQLDataType.VARCHAR, varcharDef.getDataType());
+	}
+	
+	@Test
+	public void testVarcharNotNull(){
+		varcharDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varchar()
+				.length(size)
+				.notNull()
+				.build();
+		assertTrue(varcharDef.isNotNull());
+	}
+	
+	@Test
+	public void testVarcharPrimaryKey(){
+		varcharDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varchar()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertTrue(varcharDef.isPrimaryKey());
 	}
 	
 	/*
@@ -101,5 +124,41 @@ public class ColumnDefinitionVARCHARTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringVARCHAR(){
 		assertEquals(columnName + " " + SQLDataType.VARCHAR + "(" + size + ")", varcharDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARCHARNotNull(){
+		varcharDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varchar()
+				.length(size)
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARCHAR + "(" + size + ") NOT NULL", varcharDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARCHARPrimaryKey(){
+		varcharDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varchar()
+				.length(size)
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARCHAR + "(" + size + ") PRIMARY KEY",
+				varcharDef.toString());
+	}
+	
+	@Test
+	public void testToStringVARCHARAll(){
+		varcharDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.varchar()
+				.length(size)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.VARCHAR + "(" + size + ") NOT NULL PRIMARY KEY",
+				varcharDef.toString());
 	}
 }

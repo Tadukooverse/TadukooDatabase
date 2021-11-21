@@ -43,6 +43,17 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testFloatNotNull(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertTrue(floatDef.isNotNull());
+	}
+	
+	@Test
 	public void testFloatUnsigned(){
 		floatDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -62,6 +73,17 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(floatDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testFloatPrimaryKey(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertTrue(floatDef.isPrimaryKey());
 	}
 	
 	/*
@@ -103,6 +125,17 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringFLOATNotNull(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.FLOAT + " NOT NULL", floatDef.toString());
+	}
+	
+	@Test
 	public void testToStringFLOATUnsigned(){
 		floatDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -125,15 +158,29 @@ public class ColumnDefinitionFLOATTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringFLOATPrimaryKey(){
+		floatDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.floatType()
+				.defaultSizeAndDigits()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.FLOAT + " PRIMARY KEY", floatDef.toString());
+	}
+	
+	@Test
 	public void testToStringFLOATAll(){
 		floatDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.floatType()
 				.sizeAndDigits(size, digits)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.FLOAT + "(" + size + ", " + digits + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.FLOAT + "(" + size + ", " + digits + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				floatDef.toString());
 	}
 }

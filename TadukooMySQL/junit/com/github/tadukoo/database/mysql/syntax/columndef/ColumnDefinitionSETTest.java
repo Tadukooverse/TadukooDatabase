@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionSETTest implements ColumnDefinitionConstants{
@@ -45,6 +46,28 @@ public class ColumnDefinitionSETTest implements ColumnDefinitionConstants{
 		assertEquals(2, values.size());
 		assertEquals("Derp", values.get(0));
 		assertEquals("Plop", values.get(1));
+	}
+	
+	@Test
+	public void testSetNotNull(){
+		setDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.set()
+				.values(values)
+				.notNull()
+				.build();
+		assertTrue(setDef.isNotNull());
+	}
+	
+	@Test
+	public void testSetPrimaryKey(){
+		setDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.set()
+				.values(values)
+				.primaryKey()
+				.build();
+		assertTrue(setDef.isPrimaryKey());
 	}
 	
 	/*
@@ -123,5 +146,41 @@ public class ColumnDefinitionSETTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringSET(){
 		assertEquals(columnName + " " + SQLDataType.SET + "(" + valuesString + ")", setDef.toString());
+	}
+	
+	@Test
+	public void testToStringSETNotNull(){
+		setDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.set()
+				.values(values)
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SET + "(" + valuesString + ") NOT NULL", setDef.toString());
+	}
+	
+	@Test
+	public void testToStringSETPrimaryKey(){
+		setDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.set()
+				.values(values)
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SET + "(" + valuesString + ") PRIMARY KEY",
+				setDef.toString());
+	}
+	
+	@Test
+	public void testToStringSETAll(){
+		setDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.set()
+				.values(values)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.SET + "(" + valuesString + ") NOT NULL PRIMARY KEY",
+				setDef.toString());
 	}
 }

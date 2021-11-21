@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionLONGBLOBTest implements ColumnDefinitionConstants{
@@ -26,6 +27,26 @@ public class ColumnDefinitionLONGBLOBTest implements ColumnDefinitionConstants{
 	@Test
 	public void testSetLongblob(){
 		assertEquals(SQLDataType.LONGBLOB, longblobDef.getDataType());
+	}
+	
+	@Test
+	public void testSetLongblobNotNull(){
+		longblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longblob()
+				.notNull()
+				.build();
+		assertTrue(longblobDef.isNotNull());
+	}
+	
+	@Test
+	public void testSetLongblobPrimaryKey(){
+		longblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longblob()
+				.primaryKey()
+				.build();
+		assertTrue(longblobDef.isPrimaryKey());
 	}
 	
 	/*
@@ -53,5 +74,36 @@ public class ColumnDefinitionLONGBLOBTest implements ColumnDefinitionConstants{
 	@Test
 	public void testToStringLONGBLOB(){
 		assertEquals(columnName + " " + SQLDataType.LONGBLOB, longblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGBLOBNotNull(){
+		longblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longblob()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGBLOB + " NOT NULL", longblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGBLOBPrimaryKey(){
+		longblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longblob()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGBLOB + " PRIMARY KEY", longblobDef.toString());
+	}
+	
+	@Test
+	public void testToStringLONGBLOBAll(){
+		longblobDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.longblob()
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.LONGBLOB + " NOT NULL PRIMARY KEY", longblobDef.toString());
 	}
 }

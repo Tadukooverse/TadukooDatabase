@@ -42,6 +42,17 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testIntegerNotNull(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertTrue(integerDef.isNotNull());
+	}
+	
+	@Test
 	public void testIntegerUnsigned(){
 		integerDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -61,6 +72,17 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 				.autoIncrement()
 				.build();
 		assertTrue(integerDef.isAutoIncremented());
+	}
+	
+	@Test
+	public void testIntegerPrimaryKey(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.size(size)
+				.primaryKey()
+				.build();
+		assertTrue(integerDef.isPrimaryKey());
 	}
 	
 	/*
@@ -148,6 +170,17 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringINTEGERNotNull(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.defaultSize()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.INTEGER + " NOT NULL", integerDef.toString());
+	}
+	
+	@Test
 	public void testToStringINTEGERUnsigned(){
 		integerDef = ColumnDefinition.builder()
 				.columnName(columnName)
@@ -170,15 +203,29 @@ public class ColumnDefinitionINTEGERTest implements ColumnDefinitionConstants{
 	}
 	
 	@Test
+	public void testToStringINTEGERPrimaryKey(){
+		integerDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.integer()
+				.defaultSize()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.INTEGER + " PRIMARY KEY", integerDef.toString());
+	}
+	
+	@Test
 	public void testToStringINTEGERAll(){
 		integerDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.integer()
 				.size(size)
+				.notNull()
 				.unsigned()
 				.autoIncrement()
+				.primaryKey()
 				.build();
-		assertEquals(columnName + " " + SQLDataType.INTEGER + "(" + size + ") UNSIGNED AUTO_INCREMENT",
+		assertEquals(columnName + " " + SQLDataType.INTEGER + "(" + size + ") " +
+						"NOT NULL UNSIGNED AUTO_INCREMENT PRIMARY KEY",
 				integerDef.toString());
 	}
 }

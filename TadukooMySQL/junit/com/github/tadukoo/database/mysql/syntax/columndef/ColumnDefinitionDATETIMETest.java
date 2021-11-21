@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ColumnDefinitionDATETIMETest implements ColumnDefinitionConstants{
@@ -38,6 +39,28 @@ public class ColumnDefinitionDATETIMETest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertNull(datetimeDef.getFractionalSecondsPrecision());
+	}
+	
+	@Test
+	public void testDatetimeNotNull(){
+		datetimeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.datetime()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertTrue(datetimeDef.isNotNull());
+	}
+	
+	@Test
+	public void testDatetimePrimaryKey(){
+		datetimeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.datetime()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertTrue(datetimeDef.isPrimaryKey());
 	}
 	
 	/*
@@ -125,5 +148,40 @@ public class ColumnDefinitionDATETIMETest implements ColumnDefinitionConstants{
 				.defaultFractionalSecondsPrecision()
 				.build();
 		assertEquals(columnName + " " + SQLDataType.DATETIME, datetimeDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATETIMENotNull(){
+		datetimeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.datetime()
+				.defaultFractionalSecondsPrecision()
+				.notNull()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATETIME + " NOT NULL", datetimeDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATETIMEPrimaryKey(){
+		datetimeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.datetime()
+				.defaultFractionalSecondsPrecision()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATETIME + " PRIMARY KEY", datetimeDef.toString());
+	}
+	
+	@Test
+	public void testToStringDATETIMEAll(){
+		datetimeDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.datetime()
+				.fractionalSecondsPrecision(fractionalSecondsPrecision)
+				.notNull()
+				.primaryKey()
+				.build();
+		assertEquals(columnName + " " + SQLDataType.DATETIME + "(" + fractionalSecondsPrecision + ")" +
+				" NOT NULL PRIMARY KEY", datetimeDef.toString());
 	}
 }
