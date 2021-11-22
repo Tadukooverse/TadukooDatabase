@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -119,6 +120,31 @@ public class SQLCreateStatementTest{
 	}
 	
 	@Test
+	public void testBuilderDefaultForeignKeys(){
+		List<ForeignKeyConstraint> foreignKeys = stmt.getForeignKeys();
+		assertNotNull(foreignKeys);
+		assertEquals(0, foreignKeys.size());
+	}
+	
+	@Test
+	public void testBuilderTableSetForeignKeys(){
+		ForeignKeyConstraint foreignKey = ForeignKeyConstraint.builder()
+				.columnNames("Test")
+				.references("Derp")
+				.referenceColumnNames("Plop")
+				.build();
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.tableName("Test")
+				.columns(ColumnDefinition.builder().columnName("Derp").year().build())
+				.foreignKey(foreignKey)
+				.build();
+		List<ForeignKeyConstraint> foreignKeys = stmt.getForeignKeys();
+		assertEquals(1, foreignKeys.size());
+		assertEquals(foreignKey, foreignKeys.get(0));
+	}
+	
+	@Test
 	public void testBuilderTableMissingAs(){
 		try{
 			stmt = SQLCreateStatement.builder()
@@ -202,5 +228,56 @@ public class SQLCreateStatementTest{
 				.columns(col1, col2)
 				.build();
 		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 + ", " + col2 + ")", stmt.toString());
+	}
+	
+	@Test
+	public void testToStringTableForeignKey(){
+		String tableName = "Test";
+		ColumnDefinition col1 = ColumnDefinition.builder()
+				.columnName("Derp")
+				.bit()
+				.defaultLength()
+				.build();
+		ForeignKeyConstraint foreignKey = ForeignKeyConstraint.builder()
+				.columnNames("Test")
+				.references("Derp")
+				.referenceColumnNames("Plop")
+				.build();
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.tableName(tableName)
+				.columns(col1)
+				.foreignKey(foreignKey)
+				.build();
+		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 +") " + foreignKey, stmt.toString());
+	}
+	
+	@Test
+	public void testToStringTableForeignKeys(){
+		String tableName = "Test";
+		ColumnDefinition col1 = ColumnDefinition.builder()
+				.columnName("Derp")
+				.bit()
+				.defaultLength()
+				.build();
+		ForeignKeyConstraint foreignKey = ForeignKeyConstraint.builder()
+				.columnNames("Test")
+				.references("Derp")
+				.referenceColumnNames("Plop")
+				.build();
+		ForeignKeyConstraint foreignKey2 = ForeignKeyConstraint.builder()
+				.columnNames("Yep")
+				.references("Nope")
+				.referenceColumnNames("Maybe")
+				.build();
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.tableName(tableName)
+				.columns(col1)
+				.foreignKey(foreignKey)
+				.foreignKey(foreignKey2)
+				.build();
+		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 +") " + foreignKey +
+				" " + foreignKey2, stmt.toString());
 	}
 }

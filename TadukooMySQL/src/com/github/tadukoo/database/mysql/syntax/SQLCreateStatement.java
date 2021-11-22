@@ -44,12 +44,18 @@ public class SQLCreateStatement{
 	 *         <td>The {@link ColumnDefinition columns} to create in the table</td>
 	 *         <td>Requires either this or selectStmt</td>
 	 *     </tr>
+	 *     <tr>
+	 *         <td>foreignKeys</td>
+	 *         <td>The {@link ForeignKeyConstraint foreign keys} to add to the table</td>
+	 *         <td>Defaults to an empty list</td>
+	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLCreateStatementBuilder implements Type, TableName, AsOrColumns, DatabaseName, Build{
+	public static class SQLCreateStatementBuilder implements Type, TableName, AsOrColumns, DatabaseName,
+			ForeignKeysOrBuild, Build{
 		/** The {@link SQLType type} to be created */
 		private SQLType type;
 		/** The name of the table/database to be created */
@@ -58,6 +64,8 @@ public class SQLCreateStatement{
 		private SQLSelectStatement selectStmt = null;
 		/** The {@link ColumnDefinition columns} to create in the table */
 		private List<ColumnDefinition> columns = new ArrayList<>();
+		/** The {@link ForeignKeyConstraint foreign keys} to add to the table */
+		private List<ForeignKeyConstraint> foreignKeys = new ArrayList<>();
 		
 		/** Not allowed to instantiate outside of SQLCreateDatabaseStatement */
 		private SQLCreateStatementBuilder(){ }
@@ -85,22 +93,29 @@ public class SQLCreateStatement{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build as(SQLSelectStatement selectStmt){
+		public ForeignKeysOrBuild as(SQLSelectStatement selectStmt){
 			this.selectStmt = selectStmt;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build columns(List<ColumnDefinition> columns){
+		public ForeignKeysOrBuild columns(List<ColumnDefinition> columns){
 			this.columns = columns;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Build columns(ColumnDefinition ... columns){
+		public ForeignKeysOrBuild columns(ColumnDefinition ... columns){
 			this.columns = ListUtil.createList(columns);
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public ForeignKeysOrBuild foreignKey(ForeignKeyConstraint foreignKey){
+			this.foreignKeys.add(foreignKey);
 			return this;
 		}
 		
@@ -139,7 +154,7 @@ public class SQLCreateStatement{
 		public SQLCreateStatement build(){
 			checkForErrors();
 			
-			return new SQLCreateStatement(type, name, selectStmt, columns);
+			return new SQLCreateStatement(type, name, selectStmt, columns, foreignKeys);
 		}
 	}
 	
@@ -151,6 +166,8 @@ public class SQLCreateStatement{
 	private final SQLSelectStatement selectStmt;
 	/** The {@link ColumnDefinition columns} to create in the table */
 	private final List<ColumnDefinition> columns;
+	/** The {@link ForeignKeyConstraint foreign keys} to add to the table */
+	private final List<ForeignKeyConstraint> foreignKeys;
 	
 	/**
 	 * Constructs a new {@link SQLCreateStatement} with the given parameters
@@ -159,13 +176,16 @@ public class SQLCreateStatement{
 	 * @param name The name of the table/database to be created
 	 * @param selectStmt The {@link SQLSelectStatement select statement} to use to grab another table
 	 * @param columns The {@link ColumnDefinition columns} to create in the table
+	 * @param foreignKeys The {@link ForeignKeyConstraint foreign keys} to add to the table
 	 */
 	private SQLCreateStatement(
-			SQLType type, String name, SQLSelectStatement selectStmt, List<ColumnDefinition> columns){
+			SQLType type, String name, SQLSelectStatement selectStmt, List<ColumnDefinition> columns,
+			List<ForeignKeyConstraint> foreignKeys){
 		this.type = type;
 		this.name = name;
 		this.selectStmt = selectStmt;
 		this.columns = columns;
+		this.foreignKeys = foreignKeys;
 	}
 	
 	/**
@@ -203,6 +223,13 @@ public class SQLCreateStatement{
 		return columns;
 	}
 	
+	/**
+	 * @return The {@link ForeignKeyConstraint foreign keys} to add to the table
+	 */
+	public List<ForeignKeyConstraint> getForeignKeys(){
+		return foreignKeys;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
@@ -223,6 +250,13 @@ public class SQLCreateStatement{
 			// Remove last comma
 			stmt.delete(stmt.length()-2, stmt.length());
 			stmt.append(')');
+		}
+		
+		// If we have foreign keys, add them to the statement
+		if(ListUtil.isNotBlank(foreignKeys)){
+			for(ForeignKeyConstraint foreignKey: foreignKeys){
+				stmt.append(' ').append(foreignKey);
+			}
 		}
 		
 		return stmt.toString();
@@ -272,19 +306,31 @@ public class SQLCreateStatement{
 		 * @param selectStmt The {@link SQLSelectStatement select statement} to use to grab another table
 		 * @return this, to continue building
 		 */
-		Build as(SQLSelectStatement selectStmt);
+		ForeignKeysOrBuild as(SQLSelectStatement selectStmt);
 		
 		/**
 		 * @param columns The {@link ColumnDefinition columns} to create in the table
 		 * @return this, to continue building
 		 */
-		Build columns(List<ColumnDefinition> columns);
+		ForeignKeysOrBuild columns(List<ColumnDefinition> columns);
 		
 		/**
 		 * @param columns The {@link ColumnDefinition columns} to create in the table
 		 * @return this, to continue building
 		 */
-		Build columns(ColumnDefinition ... columns);
+		ForeignKeysOrBuild columns(ColumnDefinition ... columns);
+	}
+	
+	/**
+	 * The Foreign Keys or Building part of building a {@link SQLCreateStatement}
+	 */
+	public interface ForeignKeysOrBuild extends Build{
+		
+		/**
+		 * @param foreignKey A {@link ForeignKeyConstraint foreign key} to add to the table
+		 * @return this, to continue building
+		 */
+		ForeignKeysOrBuild foreignKey(ForeignKeyConstraint foreignKey);
 	}
 	
 	/**

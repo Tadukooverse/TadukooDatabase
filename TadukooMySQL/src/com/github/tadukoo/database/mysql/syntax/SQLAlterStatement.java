@@ -35,19 +35,25 @@ public class SQLAlterStatement{
 	 *     <tr>
 	 *         <td>columnName</td>
 	 *         <td>The name of the column to alter</td>
-	 *         <td>Either this or columnDef required, depending on operation</td>
+	 *         <td>Either this or columnDef or foreignKey required, depending on operation</td>
 	 *     </tr>
 	 *     <tr>
 	 *         <td>columnDef</td>
 	 *         <td>The {@link ColumnDefinition column definition} to be used</td>
-	 *         <td>Either this or columnName required, depending on operation</td>
+	 *         <td>Either this or columnName or foreign key required, depending on operation</td>
+	 *     </tr>
+	 *     <tr>
+	 *         <td>foreignKey</td>
+	 *         <td>The {@link ForeignKeyConstraint foreign key} to be added to the table</td>
+	 *         <td>Either this or columnName or columnDef required, depending on operation</td>
 	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLAlterStatementBuilder implements Type, TableName, Operation, ColumnName, ColumnDef, Build{
+	public static class SQLAlterStatementBuilder implements Type, TableName, Operation, ColumnName,
+			ColumnDefOrForeignKey, ColumnDef, Build{
 		/** The {@link SQLType type} to be altered */
 		private SQLType type;
 		/** The name of the table to alter */
@@ -58,6 +64,8 @@ public class SQLAlterStatement{
 		private String columnName = null;
 		/** The {@link ColumnDefinition column definition} to be used */
 		private ColumnDefinition columnDef = null;
+		/** The {@link ForeignKeyConstraint foreign key} to be added to the table */
+		private ForeignKeyConstraint foreignKey = null;
 		
 		/** Not allowed to instantiate outside {@link SQLAlterStatement} */
 		private SQLAlterStatementBuilder(){ }
@@ -78,7 +86,7 @@ public class SQLAlterStatement{
 		
 		/** {@inheritDoc} */
 		@Override
-		public ColumnDef add(){
+		public ColumnDefOrForeignKey add(){
 			this.operation = SQLColumnOperation.ADD;
 			return this;
 		}
@@ -106,6 +114,13 @@ public class SQLAlterStatement{
 		
 		/** {@inheritDoc} */
 		@Override
+		public Build foreignKey(ForeignKeyConstraint foreignKey){
+			this.foreignKey = foreignKey;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
 		public Build columnDef(ColumnDefinition columnDef){
 			this.columnDef = columnDef;
 			return this;
@@ -122,9 +137,9 @@ public class SQLAlterStatement{
 				errors.add("tableName is required!");
 			}
 			
-			// columnName or columnDef is required
-			if(StringUtil.isBlank(columnName) && columnDef == null){
-				errors.add("columnName or columnDef must be specified!");
+			// columnName or columnDef or foreign key is required
+			if(StringUtil.isBlank(columnName) && columnDef == null && foreignKey == null){
+				errors.add("columnName or columnDef or foreignKey must be specified!");
 			}
 			
 			// Report any errors
@@ -139,7 +154,7 @@ public class SQLAlterStatement{
 		public SQLAlterStatement build(){
 			checkForErrors();
 			
-			return new SQLAlterStatement(type, tableName, operation, columnName, columnDef);
+			return new SQLAlterStatement(type, tableName, operation, columnName, columnDef, foreignKey);
 		}
 	}
 	
@@ -153,6 +168,8 @@ public class SQLAlterStatement{
 	private final String columnName;
 	/** The {@link ColumnDefinition column definition} to be used */
 	private final ColumnDefinition columnDef;
+	/** The {@link ForeignKeyConstraint foreign key} to be added to the table */
+	private final ForeignKeyConstraint foreignKey;
 	
 	/**
 	 * Constructs a {@link SQLAlterStatement} using the given parameters
@@ -162,15 +179,17 @@ public class SQLAlterStatement{
 	 * @param operation The {@link SQLColumnOperation operation} to perform
 	 * @param columnName The name of the column to alter
 	 * @param columnDef The {@link ColumnDefinition column definition} to be used
+	 * @param foreignKey The {@link ForeignKeyConstraint foreign key} to be added to the table
 	 */
 	private SQLAlterStatement(
 			SQLType type, String tableName, SQLColumnOperation operation,
-			String columnName, ColumnDefinition columnDef){
+			String columnName, ColumnDefinition columnDef, ForeignKeyConstraint foreignKey){
 		this.type = type;
 		this.tableName = tableName;
 		this.operation = operation;
 		this.columnName = columnName;
 		this.columnDef = columnDef;
+		this.foreignKey = foreignKey;
 	}
 	
 	/**
@@ -215,6 +234,13 @@ public class SQLAlterStatement{
 		return columnDef;
 	}
 	
+	/**
+	 * @return The {@link ForeignKeyConstraint foreign key} to be added to the table
+	 */
+	public ForeignKeyConstraint getForeignKey(){
+		return foreignKey;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
@@ -222,9 +248,11 @@ public class SQLAlterStatement{
 		StringBuilder stmt = new StringBuilder("ALTER ").append(type).append(' ').append(tableName)
 				.append(' ').append(operation).append(' ');
 		
-		// Append either columnName or columnDef
+		// Append either columnName or columnDef or foreign key
 		if(columnDef != null){
 			stmt.append(columnDef);
+		}else if(foreignKey != null){
+			stmt.append(foreignKey);
 		}else{
 			stmt.append(columnName);
 		}
@@ -266,7 +294,7 @@ public class SQLAlterStatement{
 		 * Sets the {@link SQLColumnOperation operation} to add a column
 		 * @return this, to continue building
 		 */
-		ColumnDef add();
+		ColumnDefOrForeignKey add();
 		
 		/**
 		 * Sets the {@link SQLColumnOperation operation} to modify a column
@@ -290,6 +318,18 @@ public class SQLAlterStatement{
 		 * @return this, to continue building
 		 */
 		Build columnName(String columnName);
+	}
+	
+	/**
+	 * The {@link ColumnDefinition column definition} or {@link ForeignKeyConstraint foreign key} part of building
+	 * a {@link SQLAlterStatement}
+	 */
+	public interface ColumnDefOrForeignKey extends ColumnDef{
+		/**
+		 * @param foreignKey The {@link ForeignKeyConstraint foreign key} to add to the table
+		 * @return this, to continue building
+		 */
+		Build foreignKey(ForeignKeyConstraint foreignKey);
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SQLAlterStatementTest{
@@ -12,6 +13,7 @@ public class SQLAlterStatementTest{
 	private SQLColumnOperation operation;
 	private String columnName;
 	private ColumnDefinition columnDef;
+	private ForeignKeyConstraint foreignKey;
 	private SQLAlterStatement stmt;
 	
 	@BeforeEach
@@ -23,6 +25,11 @@ public class SQLAlterStatementTest{
 		columnDef = ColumnDefinition.builder()
 				.columnName(columnName)
 				.bool()
+				.build();
+		foreignKey = ForeignKeyConstraint.builder()
+				.columnNames("Test")
+				.references("Derp")
+				.referenceColumnNames("Plop")
 				.build();
 		stmt = SQLAlterStatement.builder()
 				.table()
@@ -86,6 +93,22 @@ public class SQLAlterStatementTest{
 	}
 	
 	@Test
+	public void testBuilderDefaultForeignKey(){
+		assertNull(stmt.getForeignKey());
+	}
+	
+	@Test
+	public void testBuilderSetForeignKey(){
+		stmt = SQLAlterStatement.builder()
+				.table()
+				.tableName(tableName)
+				.add()
+				.foreignKey(foreignKey)
+				.build();
+		assertEquals(foreignKey, stmt.getForeignKey());
+	}
+	
+	@Test
 	public void testBuilderMissingTableName(){
 		try{
 			stmt = SQLAlterStatement.builder()
@@ -113,7 +136,7 @@ public class SQLAlterStatementTest{
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered errors in building a SQLAlterStatement: \n" +
-					"columnName or columnDef must be specified!", e.getMessage());
+					"columnName or columnDef or foreignKey must be specified!", e.getMessage());
 		}
 	}
 	
@@ -129,7 +152,23 @@ public class SQLAlterStatementTest{
 			fail();
 		}catch(IllegalArgumentException e){
 			assertEquals("Encountered errors in building a SQLAlterStatement: \n" +
-					"columnName or columnDef must be specified!", e.getMessage());
+					"columnName or columnDef or foreignKey must be specified!", e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testBuilderMissingForeignKey(){
+		try{
+			stmt = SQLAlterStatement.builder()
+					.table()
+					.tableName(tableName)
+					.add()
+					.foreignKey(null)
+					.build();
+			fail();
+		}catch(IllegalArgumentException e){
+			assertEquals("Encountered errors in building a SQLAlterStatement: \n" +
+					"columnName or columnDef or foreignKey must be specified!", e.getMessage());
 		}
 	}
 	
@@ -147,13 +186,24 @@ public class SQLAlterStatementTest{
 			assertEquals("""
 					Encountered errors in building a SQLAlterStatement:\s
 					tableName is required!
-					columnName or columnDef must be specified!""", e.getMessage());
+					columnName or columnDef or foreignKey must be specified!""", e.getMessage());
 		}
 	}
 	
 	@Test
 	public void testToStringAdd(){
 		assertEquals("ALTER " + type + " " + tableName + " " + operation + " " + columnDef, stmt.toString());
+	}
+	
+	@Test
+	public void testToStringAddForeignKey(){
+		stmt = SQLAlterStatement.builder()
+				.table()
+				.tableName(tableName)
+				.add()
+				.foreignKey(foreignKey)
+				.build();
+		assertEquals("ALTER " + type + " " + tableName + " " + operation + " " + foreignKey, stmt.toString());
 	}
 	
 	@Test
