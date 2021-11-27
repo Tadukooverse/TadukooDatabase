@@ -1,12 +1,16 @@
 package com.github.tadukoo.database.mysql.syntax;
 
+import com.github.tadukoo.database.mysql.syntax.conditional.Conditional;
 import com.github.tadukoo.database.mysql.syntax.conditional.ConditionalStatement;
+import com.github.tadukoo.database.mysql.syntax.conditional.SQLConjunctiveOperator;
 import com.github.tadukoo.database.mysql.syntax.conditional.SQLOperator;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
 import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
+import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -122,5 +126,73 @@ public class SQLSyntaxUtil{
 		
 		// Return the insert statement string
 		return insertStmt.toString();
+	}
+	
+	/**
+	 * Creates a Select statement for the given parameters
+	 *
+	 * @param tables The name of the tables to select from
+	 * @param returnColumns The names of the columns to be returned
+	 * @param cols The names of the columns to include in the where query
+	 * @param values The values for the columns in the where query
+	 * @param search Whether this is a search (to do LIKE %value% for string values instead of equals)
+	 * @return The SQL text for the select statement
+	 */
+	public static String formatQuery(
+			Collection<String> tables, Collection<String> returnColumns, Collection<String> cols,
+			Collection<Object> values, boolean search){
+		// Cols and Values must be the same size
+		if(cols.size() != values.size()){
+			throw new IllegalArgumentException("cols and values must be the same size!");
+		}
+		
+		// Convert the tables into TableRefs
+		List<TableRef> fromTables = tables.stream()
+				.map(table -> TableRef.builder().tableName(table).build())
+				.collect(Collectors.toList());
+		
+		// Convert the return columns into ColumnRefs
+		List<ColumnRef> returnCols = returnColumns.stream()
+				.map(SQLSyntaxUtil::makeColumnRef)
+				.collect(Collectors.toList());
+		
+		// Make the conditional
+		Conditional cond = null;
+		if(values.size() == 1){
+			cond = Conditional.builder()
+					.firstCondStmt(makeConditionalStmt(search, cols.iterator().next(), values.iterator().next()))
+					.build();
+		}else{
+			// Iterate over the columns and values
+			Iterator<String> colIt = cols.iterator();
+			Iterator<Object> valIt = values.iterator();
+			while(colIt.hasNext()){
+				ConditionalStatement condStmt = makeConditionalStmt(search, colIt.next(), valIt.next());
+				if(cond == null){
+					// If this is the first one, build a new conditional with just the first statement
+					cond = Conditional.builder()
+							.firstCondStmt(condStmt)
+							.build();
+				}else{
+					// If we already started the conditional, and this statement with the existing conditional
+					cond = Conditional.builder()
+							.firstCond(cond)
+							.operator(SQLConjunctiveOperator.AND)
+							.secondCondStmt(condStmt)
+							.build();
+				}
+			}
+		}
+		
+		// Build the select statement
+		SQLSelectStatement selectStmt = SQLSelectStatement.builder()
+				.distinct()
+				.returnColumns(returnCols)
+				.fromTables(fromTables)
+				.whereStatement(cond)
+				.build();
+		
+		// Return the select statement string
+		return selectStmt.toString();
 	}
 }

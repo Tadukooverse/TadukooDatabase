@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SQLSyntaxUtilTest{
 	
@@ -118,5 +119,37 @@ public class SQLSyntaxUtilTest{
 		String insertStmt = SQLSyntaxUtil.formatInsertStatement("Test", ListUtil.createList("Derp", "Plop"),
 				ListUtil.createList(42, true));
 		assertEquals("INSERT INTO Test (Derp, Plop) VALUES (42, true)", insertStmt);
+	}
+	
+	@Test
+	public void testFormatQueryError(){
+		try{
+			SQLSyntaxUtil.formatQuery(ListUtil.createList("Test"), ListUtil.createList("Derp"),
+					ListUtil.createList("Plop"), ListUtil.createList(), false);
+			fail();
+		}catch(IllegalArgumentException e){
+			assertEquals("cols and values must be the same size!", e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testFormatQuery(){
+		String selectStmt = SQLSyntaxUtil.formatQuery(ListUtil.createList("Test"), ListUtil.createList("Derp"),
+				ListUtil.createList("Plop"), ListUtil.createList(42), false);
+		assertEquals("SELECT DISTINCT Derp FROM Test WHERE Plop = 42", selectStmt);
+	}
+	
+	@Test
+	public void testFormatQueryMultipleConditions(){
+		String selectStmt = SQLSyntaxUtil.formatQuery(ListUtil.createList("Test"), ListUtil.createList("Derp"),
+				ListUtil.createList("Plop", "Yep"), ListUtil.createList(42, "something"), false);
+		assertEquals("SELECT DISTINCT Derp FROM Test WHERE (Plop = 42) AND Yep = 'something'", selectStmt);
+	}
+	
+	@Test
+	public void testFormatQuerySearchTrue(){
+		String selectStmt = SQLSyntaxUtil.formatQuery(ListUtil.createList("Test"), ListUtil.createList("Derp"),
+				ListUtil.createList("Plop", "Yep"), ListUtil.createList(42, "something"), true);
+		assertEquals("SELECT DISTINCT Derp FROM Test WHERE (Plop = 42) AND Yep LIKE '%something%'", selectStmt);
 	}
 }
