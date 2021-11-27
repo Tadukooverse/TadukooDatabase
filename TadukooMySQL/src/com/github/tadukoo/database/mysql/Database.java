@@ -1,5 +1,6 @@
 package com.github.tadukoo.database.mysql;
 
+import com.github.tadukoo.database.mysql.syntax.SQLSyntaxUtil;
 import com.github.tadukoo.database.mysql.transaction.InsertAndGetID;
 import com.github.tadukoo.database.mysql.transaction.query.Query;
 import com.github.tadukoo.database.mysql.transaction.SQLTransaction;
@@ -28,6 +29,7 @@ public class Database{
 	// TODO: Make this configurable
 	private static final int MAX_ATTEMPTS = 10;
 	
+	// TODO: Make a builder, with port, dbName being optional, pass allowing empty string but not null
 	private final EasyLogger logger;
 	private final String host;
 	private final int port;
@@ -60,6 +62,12 @@ public class Database{
 	 * @return The Connection that's been created
 	 */
 	private Connection connect() throws SQLException{
+		// Create the connection string
+		String connString = "jdbc:mysql://" + host;
+		if(port != -1){
+		
+		}
+		
 		// Create the connection with the appropriate url and login credentials
 		Connection conn = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + dbName + 
 														"?user=" + user + "&password=" + pass);
@@ -123,71 +131,6 @@ public class Database{
 		return executeTransaction(Query.createQuery(name, sql, convertFromResultSet));
 	}
 	
-	// TODO: Rework this (Move to DBUtil and such)
-	public<ResultType> ResultType doSearch(ThrowingFunction<ResultSet, ResultType, SQLException> convertFromResultSet,
-			String returnPieces, String mainTable, 
-			Collection<String> otherTables, Collection<String> junctions, 
-			String[] intArgs, int[] intValues, 
-			boolean[] partialStrings, String[] stringArgs, String[] stringValues) throws SQLException{
-		if(junctions != null && junctions.size() > 0 && (otherTables == null || otherTables.size() == 0)){
-			throw new IllegalArgumentException("Database.doSearch: Need otherTables to do junctions!");
-		}
-		if(intArgs.length != intValues.length){
-			throw new IllegalArgumentException("Database.doSearch: intArgs and intValues are different sizes!");
-		}
-		if(stringArgs.length != stringValues.length || stringArgs.length != partialStrings.length){
-			throw new IllegalArgumentException("Database.doSearch: partialStrings, stringArgs, and stringValues must be the same "
-					+ "size!");
-		}
-		StringBuilder name = new StringBuilder();
-		StringBuilder sql = new StringBuilder("select distinct " + returnPieces + " from " + mainTable);
-		boolean prevSet = false;
-		if(otherTables != null && otherTables.size() > 0){
-			for(String table: otherTables){
-				sql.append(", ").append(table);
-			}
-		}
-		boolean searchAll = junctions == null || junctions.size() == 0;
-		for(int i = 0; searchAll && i < intValues.length; i++){
-			if(intValues[i] != -1){
-				searchAll = false;
-				break;
-			}
-		}
-		for(int i = 0; searchAll && i < stringValues.length; i++){
-			String s = stringValues[i];
-			if(s != null && !s.equalsIgnoreCase("")){
-				searchAll = false;
-				break;
-			}
-		}
-		if(searchAll){
-			name.append("Get all ").append(mainTable).append("s");
-		}else{
-			name.append("Get ").append(mainTable).append("s with ");
-			sql.append(" where ");
-			
-			if(junctions != null){
-				for(String junction: junctions){
-					DBUtil.addJunctionStringToQuery(prevSet, name, sql, junction);
-					prevSet = true;
-				}
-			}
-			for(int i = 0; i < intValues.length; i++){
-				prevSet = (DBUtil.addConditionalIntToQuery(prevSet, name, sql, intArgs[i], intValues[i])) || prevSet;
-			}
-			for(int i = 0; i < stringValues.length; i++){
-				prevSet = (DBUtil.addConditionalStringToQuery(prevSet, name, sql, partialStrings[i],
-						stringArgs[i], stringValues[i])) || prevSet;
-			}
-		}
-		
-		System.out.println("Name: " + name.toString());
-		System.out.println("SQL: " + sql.toString());
-		
-		return executeQuery(name.toString(), sql.toString(), convertFromResultSet);
-	}
-	
 	/**
 	 * Executes sql updates and returns if they were a success. This version 
 	 * builds the {@link Updates} object using the given parameters.
@@ -215,11 +158,11 @@ public class Database{
 		return executeUpdates(name, Collections.singletonList(name), Collections.singletonList(sql));
 	}
 	
-	public void insert(String table, String[] args, String[] values) throws SQLException{
-		executeUpdate("Insert a " + table, DBUtil.formatInsertStatement(table, args, values));
+	public void insert(String table, Collection<String> cols, Collection<Object> values) throws SQLException{
+		executeUpdate("Insert a " + table, SQLSyntaxUtil.formatInsertStatement(table, cols, values));
 	}
 	
-	public Integer insertAndGetID(String table, String id_str, String[] args, String[] values) throws SQLException{
-		return executeTransaction(InsertAndGetID.createInsertAndGetID(table, id_str, args, values));
+	public Integer insertAndGetID(String table, String id_str, Collection<String> cols, Collection<Object> values) throws SQLException{
+		return executeTransaction(InsertAndGetID.createInsertAndGetID(table, id_str, cols, values));
 	}
 }

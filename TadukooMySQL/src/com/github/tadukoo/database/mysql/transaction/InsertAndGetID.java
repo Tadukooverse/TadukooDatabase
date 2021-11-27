@@ -1,7 +1,8 @@
 package com.github.tadukoo.database.mysql.transaction;
 
-import com.github.tadukoo.database.mysql.DBUtil;
+import com.github.tadukoo.database.mysql.syntax.SQLSyntaxUtil;
 import com.github.tadukoo.util.AutoCloseableUtil;
+import com.github.tadukoo.util.ListUtil;
 import com.github.tadukoo.util.StringUtil;
 import com.github.tadukoo.util.logger.EasyLogger;
 
@@ -9,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 
 /**
  * Insert and Get ID is a {@link SQLTransaction} that will run an insert statement on a table and then
@@ -93,14 +95,15 @@ public abstract class InsertAndGetID implements SQLTransaction<Integer>{
 	 * Creates a new {@link InsertAndGetID} using the given information.
 	 *
 	 * @param table The table to use for the insert and id retrieval
-	 * @param id_str The name of the id column in the table
-	 * @param args The columns of the table to use in the insert
-	 * @param values The values to use for the insert (should be in the same order as the args)
+	 * @param idColumnName The name of the id column in the table
+	 * @param cols The columns of the table to use in the insert
+	 * @param values The values to use for the insert (should be in the same order as the cols)
 	 * @return An {@link InsertAndGetID} object to use for a transaction
 	 */
-	public static InsertAndGetID createInsertAndGetID(String table, String id_str, String[] args, String[] values){
-		// Check that we have the same amount of args and values
-		if(args.length != values.length){
+	public static InsertAndGetID createInsertAndGetID(String table, String idColumnName, Collection<String> cols,
+	                                                  Collection<Object> values){
+		// Check that we have the same amount of cols and values
+		if(cols.size() != values.size()){
 			throw new IllegalArgumentException("Args and Values don't match up!");
 		}
 		
@@ -120,19 +123,19 @@ public abstract class InsertAndGetID implements SQLTransaction<Integer>{
 			/** {@inheritDoc} */
 			@Override
 			public String getInsertSQL(){
-				return DBUtil.formatInsertStatement(table, args, values);
+				return SQLSyntaxUtil.formatInsertStatement(table, cols, values);
 			}
 			
 			/** {@inheritDoc} */
 			@Override
 			public String getSelectString(){
-				return "Pulled out " + id_str + " of just inserted " + table + "!";
+				return "Pulled out " + idColumnName + " of just inserted " + table + "!";
 			}
 			
 			/** {@inheritDoc} */
 			@Override
 			public String getSelectSQL(){
-				return DBUtil.formatQuery(table, id_str, args, values);
+				return SQLSyntaxUtil.formatQuery(ListUtil.createList(table), ListUtil.createList(idColumnName), cols, values, false);
 			}
 		};
 	}
