@@ -24,6 +24,11 @@ public class ColumnRef{
 	 *         <th>Required or Default</th>
 	 *     </tr>
 	 *     <tr>
+	 *         <td>tableName</td>
+	 *         <td>The name of the table the column is on</td>
+	 *         <td>Defaults to null (no table name)</td>
+	 *     </tr>
+	 *     <tr>
 	 *         <td>columnName</td>
 	 *         <td>The name of the column</td>
 	 *         <td>Required</td>
@@ -38,7 +43,9 @@ public class ColumnRef{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class ColumnRefBuilder implements ColumnName, AliasAndBuild{
+	public static class ColumnRefBuilder implements TableNameOrColumnName, ColumnName, AliasOrBuild, Build{
+		/** The name of the table the column is on */
+		private String tableName;
 		/** The name of the column */
 		private String columnName;
 		/** The alias to use for the column */
@@ -48,13 +55,29 @@ public class ColumnRef{
 		private ColumnRefBuilder(){ }
 		
 		/** {@inheritDoc} */
-		public AliasAndBuild columnName(String columnName){
+		@Override
+		public ColumnName tableName(String tableName){
+			this.tableName = tableName;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public ColumnName tableRef(TableRef tableRef){
+			this.tableName = tableRef.getTableName();
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public AliasOrBuild columnName(String columnName){
 			this.columnName = columnName;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
-		public AliasAndBuild alias(String alias){
+		@Override
+		public Build alias(String alias){
 			this.alias = alias;
 			return this;
 		}
@@ -78,13 +101,16 @@ public class ColumnRef{
 		}
 		
 		/** {@inheritDoc} */
+		@Override
 		public ColumnRef build(){
 			checkForErrors();
 			
-			return new ColumnRef(columnName, alias);
+			return new ColumnRef(tableName, columnName, alias);
 		}
 	}
 	
+	/** The name of the table the column is on */
+	private final String tableName;
 	/** The name of the column */
 	private final String columnName;
 	/** The alias to use for the column */
@@ -93,10 +119,12 @@ public class ColumnRef{
 	/**
 	 * Constructs a {@link ColumnRef} using the given parameters
 	 *
+	 * @param tableName The name of the table the column is on
 	 * @param columnName The name of the column
 	 * @param alias The alias to use for the column
 	 */
-	private ColumnRef(String columnName, String alias){
+	private ColumnRef(String tableName, String columnName, String alias){
+		this.tableName = tableName;
 		this.columnName = columnName;
 		this.alias = alias;
 	}
@@ -104,8 +132,15 @@ public class ColumnRef{
 	/**
 	 * @return A {@link ColumnRefBuilder builder} to use to build a {@link ColumnRef}
 	 */
-	public static ColumnName builder(){
+	public static TableNameOrColumnName builder(){
 		return new ColumnRefBuilder();
+	}
+	
+	/**
+	 * @return The name of the table the column is on
+	 */
+	public String getTableName(){
+		return tableName;
 	}
 	
 	/**
@@ -125,7 +160,15 @@ public class ColumnRef{
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
-		StringBuilder columnRef = new StringBuilder(columnName);
+		StringBuilder columnRef = new StringBuilder();
+		
+		// Add table name and a dot if we have it
+		if(StringUtil.isNotBlank(tableName)){
+			columnRef.append(tableName).append('.');
+		}
+		
+		// Add column name
+		columnRef.append(columnName);
 		
 		// Add alias if we have it
 		if(StringUtil.isNotBlank(alias)){
@@ -147,6 +190,23 @@ public class ColumnRef{
 	 */
 	
 	/**
+	 * The Table Name or Column Name part of building a {@link ColumnRef}
+	 */
+	public interface TableNameOrColumnName extends ColumnName{
+		/**
+		 * @param tableName The name of the table the column is in
+		 * @return this, to continue building
+		 */
+		ColumnName tableName(String tableName);
+		
+		/**
+		 * @param tableRef The {@link TableRef} to use to get the table name the column is in
+		 * @return this, to continue building
+		 */
+		ColumnName tableRef(TableRef tableRef);
+	}
+	
+	/**
 	 * The Column Name part of building a {@link ColumnRef}
 	 */
 	public interface ColumnName{
@@ -154,19 +214,24 @@ public class ColumnRef{
 		 * @param columnName The name of the column
 		 * @return this, to continue building
 		 */
-		AliasAndBuild columnName(String columnName);
+		AliasOrBuild columnName(String columnName);
 	}
 	
 	/**
 	 * The Alias and building part of building a {@link ColumnRef}
 	 */
-	public interface AliasAndBuild{
+	public interface AliasOrBuild extends Build{
 		/**
 		 * @param alias The alias to use for the column
 		 * @return this, to continue building
 		 */
-		AliasAndBuild alias(String alias);
-		
+		Build alias(String alias);
+	}
+	
+	/**
+	 * The building part of building a {@link ColumnRef}
+	 */
+	public interface Build{
 		/**
 		 * Builds a new {@link ColumnRef} using the set parameters
 		 *

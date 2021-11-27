@@ -17,6 +17,32 @@ public class ColumnRefTest{
 	}
 	
 	@Test
+	public void testBuilderDefaultTableName(){
+		assertNull(columnRef.getTableName());
+	}
+	
+	@Test
+	public void testBuilderSetTableName(){
+		columnRef = ColumnRef.builder()
+				.tableName("Derp")
+				.columnName(columnName)
+				.build();
+		assertEquals("Derp", columnRef.getTableName());
+	}
+	
+	@Test
+	public void testBuilderSetTableRef(){
+		TableRef tableRef = TableRef.builder()
+				.tableName("Derp")
+				.build();
+		columnRef = ColumnRef.builder()
+				.tableRef(tableRef)
+				.columnName(columnName)
+				.build();
+		assertEquals("Derp", columnRef.getTableName());
+	}
+	
+	@Test
 	public void testBuilderSetColumnName(){
 		assertEquals(columnName, columnRef.getColumnName());
 	}
@@ -49,6 +75,15 @@ public class ColumnRefTest{
 	}
 	
 	@Test
+	public void testToStringWithTableName(){
+		columnRef = ColumnRef.builder()
+				.tableName("Derp")
+				.columnName(columnName)
+				.build();
+		assertEquals("Derp." + columnName, columnRef.toString());
+	}
+	
+	@Test
 	public void testToStringWithAlias(){
 		columnRef = ColumnRef.builder().columnName(columnName).alias("Derp").build();
 		assertEquals(columnName + " AS Derp", columnRef.toString());
@@ -58,5 +93,15 @@ public class ColumnRefTest{
 	public void testToStringWithAliasWithSpaces(){
 		columnRef = ColumnRef.builder().columnName(columnName).alias("Derp Test").build();
 		assertEquals(columnName + " AS \"Derp Test\"", columnRef.toString());
+	}
+	
+	@Test
+	public void testToStringWithAll(){
+		columnRef = ColumnRef.builder()
+				.tableName("Derp")
+				.columnName(columnName)
+				.alias("Derp Test")
+				.build();
+		assertEquals("Derp." + columnName + " AS \"Derp Test\"", columnRef.toString());
 	}
 }
