@@ -59,7 +59,7 @@ public class SQLStatement{
 		 * @return A {@link SQLSelectStatement.SQLSelectStatementBuilder builder} to use to make a
 		 * {@link SQLSelectStatement}
 		 */
-		public SQLSelectStatement.ColumnsAndTables select(){
+		public SQLSelectStatement.DistinctOrColumnsOrTables select(){
 			return SQLSelectStatement.builder();
 		}
 		

@@ -28,6 +28,11 @@ public class SQLSelectStatement{
 	 *         <th>Required or Default</th>
 	 *     </tr>
 	 *     <tr>
+	 *         <td>distinct</td>
+	 *         <td>Whether to select distinct columns or not</td>
+	 *         <td>Defaults to false</td>
+	 *     </tr>
+	 *     <tr>
 	 *         <td>returnColumns</td>
 	 *         <td>The columns to be selected</td>
 	 *         <td>Defaults to an empty list (will select all then)</td>
@@ -47,7 +52,10 @@ public class SQLSelectStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLSelectStatementBuilder implements ColumnsAndTables, WhereStatementAndBuild{
+	public static class SQLSelectStatementBuilder implements DistinctOrColumnsOrTables, ColumnsOrTables, FromTables,
+			WhereStatementAndBuild, Build{
+		/** Whether to select distinct columns or not */
+		private boolean distinct = false;
 		/** The columns to be selected */
 		private List<ColumnRef> returnColumns = new ArrayList<>();
 		/** The tables to grab data from */
@@ -59,31 +67,43 @@ public class SQLSelectStatement{
 		private SQLSelectStatementBuilder(){ }
 		
 		/** {@inheritDoc} */
-		public ColumnsAndTables returnColumns(List<ColumnRef> returnColumns){
+		@Override
+		public ColumnsOrTables distinct(){
+			this.distinct = true;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public FromTables returnColumns(List<ColumnRef> returnColumns){
 			this.returnColumns = returnColumns;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
-		public ColumnsAndTables returnColumns(ColumnRef ... returnColumns){
+		@Override
+		public FromTables returnColumns(ColumnRef ... returnColumns){
 			this.returnColumns = ListUtil.createList(returnColumns);
 			return this;
 		}
 		
 		/** {@inheritDoc} */
+		@Override
 		public WhereStatementAndBuild fromTables(List<TableRef> fromTables){
 			this.fromTables = fromTables;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
+		@Override
 		public WhereStatementAndBuild fromTables(TableRef ... fromTables){
 			this.fromTables = ListUtil.createList(fromTables);
 			return this;
 		}
 		
 		/** {@inheritDoc} */
-		public WhereStatementAndBuild whereStatement(Conditional whereStatement){
+		@Override
+		public Build whereStatement(Conditional whereStatement){
 			this.whereStatement = whereStatement;
 			return this;
 		}
@@ -107,13 +127,16 @@ public class SQLSelectStatement{
 		}
 		
 		/** {@inheritDoc} */
+		@Override
 		public SQLSelectStatement build(){
 			checkForErrors();
 			
-			return new SQLSelectStatement(returnColumns, fromTables, whereStatement);
+			return new SQLSelectStatement(distinct, returnColumns, fromTables, whereStatement);
 		}
 	}
 	
+	/** Whether to select distinct columns or not */
+	private final boolean distinct;
 	/** The columns to be selected */
 	private final List<ColumnRef> returnColumns;
 	/** The tables to grab data from */
@@ -124,11 +147,14 @@ public class SQLSelectStatement{
 	/**
 	 * Constructs a new {@link SQLSelectStatement} using the given parameters.
 	 *
+	 * @param distinct Whether to select distinct columns or not
 	 * @param returnColumns The columns to be selected
 	 * @param fromTables The tables to grab data from
 	 * @param whereStatement The conditional where statement
 	 */
-	private SQLSelectStatement(List<ColumnRef> returnColumns, List<TableRef> fromTables, Conditional whereStatement){
+	private SQLSelectStatement(boolean distinct, List<ColumnRef> returnColumns, List<TableRef> fromTables,
+	                           Conditional whereStatement){
+		this.distinct = distinct;
 		this.returnColumns = returnColumns;
 		this.fromTables = fromTables;
 		this.whereStatement = whereStatement;
@@ -137,8 +163,15 @@ public class SQLSelectStatement{
 	/**
 	 * @return A new {@link SQLSelectStatementBuilder builder} to build a {@link SQLSelectStatement}
 	 */
-	public static ColumnsAndTables builder(){
+	public static DistinctOrColumnsOrTables builder(){
 		return new SQLSelectStatementBuilder();
+	}
+	
+	/**
+	 * @return Whether to select distinct columns or not
+	 */
+	public boolean isDistinct(){
+		return distinct;
 	}
 	
 	/**
@@ -166,6 +199,11 @@ public class SQLSelectStatement{
 	@Override
 	public String toString(){
 		StringBuilder statement = new StringBuilder("SELECT ");
+		
+		// Set distinct if it's set
+		if(distinct){
+			statement.append("DISTINCT ");
+		}
 		
 		// Determine all vs. columns
 		if(ListUtil.isBlank(returnColumns)){
@@ -204,21 +242,38 @@ public class SQLSelectStatement{
 	 */
 	
 	/**
+	 * The distinct of {@link ColumnRef columns} or {@link TableRef Tables} part of building a
+	 * {@link SQLSelectStatement}
+	 */
+	public interface DistinctOrColumnsOrTables extends ColumnsOrTables{
+		/**
+		 * Sets distinct to true for this select statement
+		 * @return this, to continue building
+		 */
+		ColumnsOrTables distinct();
+	}
+	
+	/**
 	 * The {@link ColumnRef Columns} and {@link TableRef Tables} part of building a {@link SQLSelectStatement}
 	 */
-	public interface ColumnsAndTables{
+	public interface ColumnsOrTables extends FromTables{
 		/**
 		 * @param returnColumns The columns to be selected
 		 * @return this, to continue building
 		 */
-		ColumnsAndTables returnColumns(List<ColumnRef> returnColumns);
+		FromTables returnColumns(List<ColumnRef> returnColumns);
 		
 		/**
 		 * @param returnColumns The columns to be selected
 		 * @return this, to continue building
 		 */
-		ColumnsAndTables returnColumns(ColumnRef ... returnColumns);
-		
+		FromTables returnColumns(ColumnRef ... returnColumns);
+	}
+	
+	/**
+	 * The {@link TableRef Tables} part of building a {@link SQLSelectStatement}
+	 */
+	public interface FromTables{
 		/**
 		 * @param fromTables The tables to grab data from
 		 * @return this, to continue building
@@ -235,13 +290,18 @@ public class SQLSelectStatement{
 	/**
 	 * The {@link Conditional Where Statement} and building part of building a {@link SQLSelectStatement}
 	 */
-	public interface WhereStatementAndBuild{
+	public interface WhereStatementAndBuild extends Build{
 		/**
 		 * @param whereStatement The conditional where statement
 		 * @return this, to continue building
 		 */
-		WhereStatementAndBuild whereStatement(Conditional whereStatement);
-		
+		Build whereStatement(Conditional whereStatement);
+	}
+	
+	/**
+	 * The building part of building a {@link SQLSelectStatement}
+	 */
+	public interface Build{
 		/**
 		 * Builds a new {@link SQLSelectStatement} using the set parameters
 		 *

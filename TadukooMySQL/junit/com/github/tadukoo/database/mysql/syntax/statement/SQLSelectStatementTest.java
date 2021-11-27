@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -28,6 +29,20 @@ public class SQLSelectStatementTest{
 		stmt = SQLSelectStatement.builder()
 				.fromTables(fromTable)
 				.build();
+	}
+	
+	@Test
+	public void testBuilderDefaultDistinct(){
+		assertFalse(stmt.isDistinct());
+	}
+	
+	@Test
+	public void testBuilderSetDistinct(){
+		stmt = SQLSelectStatement.builder()
+				.distinct()
+				.fromTables(fromTable)
+				.build();
+		assertTrue(stmt.isDistinct());
 	}
 
 	@Test
@@ -116,6 +131,15 @@ public class SQLSelectStatementTest{
 	}
 	
 	@Test
+	public void testToStringDistinct(){
+		stmt = SQLSelectStatement.builder()
+				.distinct()
+				.fromTables(fromTable)
+				.build();
+		assertEquals("SELECT DISTINCT * FROM " + fromTable.toString(), stmt.toString());
+	}
+	
+	@Test
 	public void testToStringMultipleFromTables(){
 		TableRef table2 = TableRef.builder().tableName("Test2").build();
 		stmt = SQLSelectStatement.builder()
@@ -172,11 +196,12 @@ public class SQLSelectStatementTest{
 						.build())
 				.build();
 		stmt = SQLSelectStatement.builder()
+				.distinct()
 				.returnColumns(column, column2)
 				.fromTables(fromTable, table2)
 				.whereStatement(cond)
 				.build();
-		assertEquals("SELECT " + column.toString() + ", " + column2.toString() + " FROM " +
+		assertEquals("SELECT DISTINCT " + column.toString() + ", " + column2.toString() + " FROM " +
 						fromTable.toString() + ", " + table2.toString() + " WHERE " + cond.toString(),
 				stmt.toString());
 	}
