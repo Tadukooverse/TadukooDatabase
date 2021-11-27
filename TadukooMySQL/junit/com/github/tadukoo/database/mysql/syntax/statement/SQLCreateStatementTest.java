@@ -1,7 +1,11 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
+import com.github.tadukoo.database.mysql.syntax.ColumnDefinition;
+import com.github.tadukoo.database.mysql.syntax.ForeignKeyConstraint;
+import com.github.tadukoo.database.mysql.syntax.SQLType;
 import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.util.ListUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +33,7 @@ public class SQLCreateStatementTest{
 	
 	@Test
 	public void testBuilderDatabaseType(){
-		assertEquals(SQLType.DATABASE, stmt.getType());
+		Assertions.assertEquals(SQLType.DATABASE, stmt.getType());
 	}
 	
 	@Test

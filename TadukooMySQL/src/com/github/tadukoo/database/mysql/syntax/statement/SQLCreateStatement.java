@@ -1,5 +1,8 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
+import com.github.tadukoo.database.mysql.syntax.ColumnDefinition;
+import com.github.tadukoo.database.mysql.syntax.ForeignKeyConstraint;
+import com.github.tadukoo.database.mysql.syntax.SQLType;
 import com.github.tadukoo.util.ListUtil;
 import com.github.tadukoo.util.StringUtil;
 

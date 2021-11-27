@@ -1,5 +1,7 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
+import com.github.tadukoo.database.mysql.syntax.SQLType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +25,7 @@ public class SQLDropDatabaseStatementTest{
 	
 	@Test
 	public void testBuilderSetTypeDatabase(){
-		assertEquals(SQLType.DATABASE, stmt.getType());
+		Assertions.assertEquals(SQLType.DATABASE, stmt.getType());
 	}
 	
 	@Test

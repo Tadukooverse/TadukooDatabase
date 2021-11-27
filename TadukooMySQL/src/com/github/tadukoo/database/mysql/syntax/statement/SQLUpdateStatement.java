@@ -1,4 +1,4 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
 import com.github.tadukoo.database.mysql.syntax.conditional.Conditional;
 import com.github.tadukoo.database.mysql.syntax.conditional.EqualsStatement;

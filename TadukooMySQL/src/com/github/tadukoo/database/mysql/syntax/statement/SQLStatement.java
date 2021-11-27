@@ -1,4 +1,4 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
 /**
  * SQL Statement is a class used to create a MySQL Statement

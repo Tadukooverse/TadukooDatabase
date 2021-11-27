@@ -1,5 +1,6 @@
-package com.github.tadukoo.database.mysql.syntax;
+package com.github.tadukoo.database.mysql.syntax.statement;
 
+import com.github.tadukoo.database.mysql.syntax.SQLSyntaxUtil;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
 import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.util.ListUtil;
