@@ -30,6 +30,11 @@ public class SQLDropStatement{
 	 *         <td>Required</td>
 	 *     </tr>
 	 *     <tr>
+	 *         <td>ifExists</td>
+	 *         <td>Whether to include IF EXISTS in the statement or not</td>
+	 *         <td>Defaults to false</td>
+	 *     </tr>
+	 *     <tr>
 	 *         <td>databaseName</td>
 	 *         <td>The name of the table/database to be dropped</td>
 	 *         <td>Required</td>
@@ -39,9 +44,11 @@ public class SQLDropStatement{
 	 * @author Logan Ferree (Tadukoo)
 	 * @version Alpha v.0.3
 	 */
-	public static class SQLDropStatementBuilder implements Type, Name, Build{
+	public static class SQLDropStatementBuilder implements Type, ExistsOrName, Name, Build{
 		/** The {@link SQLType type} to be dropped */
 		private SQLType type;
+		/** Whether to include IF EXISTS in the statement or not */
+		private boolean ifExists = false;
 		/** The name of the table/database to be dropped */
 		private String name;
 		
@@ -50,15 +57,22 @@ public class SQLDropStatement{
 		
 		/** {@inheritDoc} */
 		@Override
-		public Name table(){
+		public ExistsOrName table(){
 			this.type = SQLType.TABLE;
 			return this;
 		}
 		
 		/** {@inheritDoc} */
 		@Override
-		public Name database(){
+		public ExistsOrName database(){
 			this.type = SQLType.DATABASE;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public Name ifExists(){
+			this.ifExists = true;
 			return this;
 		}
 		
@@ -92,12 +106,14 @@ public class SQLDropStatement{
 		public SQLDropStatement build(){
 			checkForErrors();
 			
-			return new SQLDropStatement(type, name);
+			return new SQLDropStatement(type, ifExists, name);
 		}
 	}
 	
 	/** The {@link SQLType type} to be dropped */
 	private final SQLType type;
+	/** Whether to include IF EXISTS in the statement or not */
+	private final boolean ifExists;
 	/** The name of the table/database to be dropped */
 	private final String name;
 	
@@ -105,10 +121,12 @@ public class SQLDropStatement{
 	 * Constructs a new {@link SQLDropStatement} with the given parameters
 	 *
 	 * @param type The {@link SQLType type} to be dropped
+	 * @param ifExists Whether to include IF EXISTS in the statement or not
 	 * @param name The name of the table/database to be dropped
 	 */
-	private SQLDropStatement(SQLType type, String name){
+	private SQLDropStatement(SQLType type, boolean ifExists, String name){
 		this.type = type;
+		this.ifExists = ifExists;
 		this.name = name;
 	}
 	
@@ -127,6 +145,13 @@ public class SQLDropStatement{
 	}
 	
 	/**
+	 * @return Whether to include IF EXISTS in the statement or not
+	 */
+	public boolean getIfExists(){
+		return ifExists;
+	}
+	
+	/**
 	 * @return The name of the table/database to be dropped
 	 */
 	public String getName(){
@@ -135,7 +160,17 @@ public class SQLDropStatement{
 	
 	@Override
 	public String toString(){
-		return "DROP " + type + " " + name;
+		StringBuilder stmt = new StringBuilder("DROP ").append(type).append(' ');
+		
+		// Add IF EXISTS if specified
+		if(ifExists){
+			stmt.append("IF EXISTS ");
+		}
+		
+		// Add the name to the end
+		stmt.append(name);
+		
+		return stmt.toString();
 	}
 	
 	/*
@@ -151,14 +186,25 @@ public class SQLDropStatement{
 		 *
 		 * @return this, to continue building
 		 */
-		Name table();
+		ExistsOrName table();
 		
 		/**
 		 * We'll be dropping a Database
 		 *
 		 * @return this, to continue building
 		 */
-		Name database();
+		ExistsOrName database();
+	}
+	
+	/**
+	 * The If Exists or Name part of building a {@link SQLDropStatement}
+	 */
+	public interface ExistsOrName extends Name{
+		/**
+		 * Sets to include IF EXISTS in the statement
+		 * @return this, to continue building
+		 */
+		Name ifExists();
 	}
 	
 	/**

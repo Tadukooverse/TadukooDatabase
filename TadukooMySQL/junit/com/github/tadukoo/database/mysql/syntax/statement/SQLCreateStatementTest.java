@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +38,21 @@ public class SQLCreateStatementTest{
 	}
 	
 	@Test
+	public void testBuilderDefaultIfNotExistsDatabase(){
+		assertFalse(stmt.getIfNotExists());
+	}
+	
+	@Test
+	public void testBuilderSetIfNotExistsDatabase(){
+		stmt = SQLCreateStatement.builder()
+				.database()
+				.ifDatabaseNotExists()
+				.databaseName(databaseName)
+				.build();
+		assertTrue(stmt.getIfNotExists());
+	}
+	
+	@Test
 	public void testBuilderDatabaseName(){
 		assertEquals(databaseName, stmt.getName());
 	}
@@ -53,6 +69,33 @@ public class SQLCreateStatementTest{
 			assertEquals("Encountered the following errors in building a " +
 					"SQLCreateStatement: \nname is required!", e.getMessage());
 		}
+	}
+	
+	@Test
+	public void testBuilderTableDefaultIfNotExists(){
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.tableName("Test")
+				.columns(ColumnDefinition.builder()
+						.columnName("Derp")
+						.tinytext()
+						.build())
+				.build();
+		assertFalse(stmt.getIfNotExists());
+	}
+	
+	@Test
+	public void testBuilderTableSetIfNotExists(){
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.ifTableNotExists()
+				.tableName("Test")
+				.columns(ColumnDefinition.builder()
+						.columnName("Derp")
+						.tinytext()
+						.build())
+				.build();
+		assertTrue(stmt.getIfNotExists());
 	}
 	
 	@Test
@@ -201,6 +244,16 @@ public class SQLCreateStatementTest{
 	}
 	
 	@Test
+	public void testToStringDatabaseIfNotExists(){
+		stmt = SQLCreateStatement.builder()
+				.database()
+				.ifDatabaseNotExists()
+				.databaseName(databaseName)
+				.build();
+		assertEquals("CREATE " + SQLType.DATABASE + " IF NOT EXISTS " + databaseName, stmt.toString());
+	}
+	
+	@Test
 	public void testToStringTableAs(){
 		String tableName = "Test";
 		SQLSelectStatement selectStmt = SQLSelectStatement.builder()
@@ -283,5 +336,20 @@ public class SQLCreateStatementTest{
 				.build();
 		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 +") " + foreignKey +
 				" " + foreignKey2, stmt.toString());
+	}
+	
+	@Test
+	public void testToStringTableIfNotExists(){
+		ColumnDefinition col = ColumnDefinition.builder()
+				.columnName("Derp")
+				.tinytext()
+				.build();
+		stmt = SQLCreateStatement.builder()
+				.table()
+				.ifTableNotExists()
+				.tableName("Test")
+				.columns(col)
+				.build();
+		assertEquals("CREATE " + SQLType.TABLE + " IF NOT EXISTS Test(" + col + ")", stmt.toString());
 	}
 }
