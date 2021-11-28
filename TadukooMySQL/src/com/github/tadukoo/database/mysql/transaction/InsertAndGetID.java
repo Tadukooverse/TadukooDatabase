@@ -100,11 +100,11 @@ public abstract class InsertAndGetID implements SQLTransaction<Integer>{
 	 * @param values The values to use for the insert (should be in the same order as the cols)
 	 * @return An {@link InsertAndGetID} object to use for a transaction
 	 */
-	public static InsertAndGetID createInsertAndGetID(String table, String idColumnName, Collection<String> cols,
-	                                                  Collection<Object> values){
+	public static InsertAndGetID createInsertAndGetID(
+			String table, String idColumnName, Collection<String> cols, Collection<Object> values){
 		// Check that we have the same amount of cols and values
 		if(cols.size() != values.size()){
-			throw new IllegalArgumentException("Args and Values don't match up!");
+			throw new IllegalArgumentException("Cols and Values don't match up!");
 		}
 		
 		return new InsertAndGetID(){
@@ -135,7 +135,8 @@ public abstract class InsertAndGetID implements SQLTransaction<Integer>{
 			/** {@inheritDoc} */
 			@Override
 			public String getSelectSQL(){
-				return SQLSyntaxUtil.formatQuery(ListUtil.createList(table), ListUtil.createList(idColumnName), cols, values, false);
+				return SQLSyntaxUtil.formatQuery(ListUtil.createList(table), ListUtil.createList(idColumnName),
+						cols, values, false);
 			}
 		};
 	}
