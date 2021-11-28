@@ -270,13 +270,6 @@ public class Database{
 	}
 	
 	/**
-	 * @return The connection String (the Connection URL + login credentials)
-	 */
-	private String getConnectionString(){
-		return getConnectionURL() + "?user=" + username + "&password=" + password;
-	}
-	
-	/**
 	 * @return The maximum number of attempts to try a SQL transaction before giving up
 	 */
 	public int getMaxAttempts(){
@@ -291,7 +284,7 @@ public class Database{
 	 */
 	private Connection connect() throws SQLException{
 		// Create the connection with the appropriate url and login credentials
-		Connection conn = DriverManager.getConnection(getConnectionString());
+		Connection conn = DriverManager.getConnection(getConnectionURL(), username, password);
 		// Disable auto-commit to allow for transactions
 		conn.setAutoCommit(false);
 		
@@ -309,34 +302,35 @@ public class Database{
 	 */
 	public <ResultType> ResultType executeTransaction(SQLTransaction<ResultType> transaction) throws SQLException{
 		// Create the connection
-		Connection conn = connect();
-		
-		// boolean to say when to stop - used in case a null result is returned
-		boolean success = false;
-		// Keep track of attempts for when to give up
-		int attempts = 0;
-		
-		// Attempt to grab a result until it works or we hit the max attempts
-		ResultType result = null;
-		while(!success && attempts < maxAttempts){
-			try{
-				result = transaction.execute(conn, logger);
-				conn.commit();
-				success = true;
-			}catch(SQLException e){
-				logger.logError("Failed to execute " + transaction.getTransactionName(), e);
-				attempts++;
+		try(Connection conn = connect()){
+			// boolean to say when to stop - used in case a null result is returned
+			boolean success = false;
+			// Keep track of attempts for when to give up
+			int attempts = 0;
+			
+			// Attempt to grab a result until it works or we hit the max attempts
+			ResultType result = null;
+			while(!success && attempts < maxAttempts){
+				try{
+					result = transaction.execute(conn, logger);
+					conn.commit();
+					success = true;
+				}catch(SQLException e){
+					logger.logError("Failed to execute " + transaction.getTransactionName(), e);
+					attempts++;
+				}
 			}
+			
+			// Throw an exception if it fails
+			if(!success){
+				conn.rollback();
+				String error = "Failed to execute transaction after " + maxAttempts + " attempts";
+				logger.logError(error);
+				throw new SQLException(error);
+			}
+			
+			return result;
 		}
-		
-		// Throw an exception if it fails
-		if(!success){
-			String error = "Failed to execute transaction after " + maxAttempts + " attempts";
-			logger.logError(error);
-			throw new SQLException(error);
-		}
-		
-		return result;
 	}
 	
 	/**
