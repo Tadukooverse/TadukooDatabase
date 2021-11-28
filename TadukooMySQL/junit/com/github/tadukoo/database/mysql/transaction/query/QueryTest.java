@@ -1,19 +1,16 @@
 package com.github.tadukoo.database.mysql.transaction.query;
 
 import com.github.tadukoo.database.mysql.CommonResultSetConverters;
-import com.github.tadukoo.database.mysql.Database;
+import com.github.tadukoo.database.mysql.DatabaseConnectionTest;
 import com.github.tadukoo.database.mysql.syntax.ColumnDefinition;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
 import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLCreateStatement;
-import com.github.tadukoo.database.mysql.syntax.statement.SQLDropStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
 import com.github.tadukoo.database.mysql.transaction.update.Updates;
 import com.github.tadukoo.junit.logger.JUnitEasyLogger;
 import com.github.tadukoo.util.ListUtil;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +20,7 @@ import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class QueryTest{
+public class QueryTest extends DatabaseConnectionTest{
 	private final TableRef table = TableRef.builder()
 			.tableName("Thing")
 			.build();
@@ -33,52 +30,10 @@ public class QueryTest{
 			.build()
 			.toString();
 	private Query<Integer> query;
-	private static final String databaseName = "TadukooDatabaseTest";
-	private static final JUnitEasyLogger logger = new JUnitEasyLogger();
-	private static Database db;
-	
-	@BeforeAll
-	public static void setupDB() throws SQLException{
-		db = Database.builder()
-				.logger(logger)
-				.host("localhost")
-				.username("root")
-				.password("")
-				.build();
-		db.executeTransaction(Updates.createUpdates("Create DB TadukooDatabaseTest",
-				null, ListUtil.createList(SQLCreateStatement.builder()
-						.database()
-						.databaseName(databaseName)
-						.build()
-						.toString())));
-		db = Database.builder()
-				.logger(logger)
-				.host("localhost")
-				.databaseName(databaseName)
-				.username("root")
-				.password("")
-				.build();
-	}
 	
 	@BeforeEach
 	public void setup(){
 		query = Query.createQuery(name, sql, CommonResultSetConverters::singleInteger);
-	}
-	
-	@AfterAll
-	public static void cleanupDB() throws SQLException{
-		db = Database.builder()
-				.logger(logger)
-				.host("localhost")
-				.username("root")
-				.password("")
-				.build();
-		db.executeTransaction(Updates.createUpdates("Drop DB TadukooDatabaseTest",
-				null, ListUtil.createList(SQLDropStatement.builder()
-						.database()
-						.name(databaseName)
-						.build()
-						.toString())));
 	}
 	
 	@Test
