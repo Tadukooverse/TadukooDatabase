@@ -331,7 +331,9 @@ public class Database{
 		
 		// Throw an exception if it fails
 		if(!success){
-			throw new SQLException("Failed to execute transaction after " + maxAttempts + " attempts");
+			String error = "Failed to execute transaction after " + maxAttempts + " attempts";
+			logger.logError(error);
+			throw new SQLException(error);
 		}
 		
 		return result;
