@@ -281,6 +281,7 @@ public class Database{
 	 * that was set in the constructor of this Database class.
 	 * 
 	 * @return The Connection that's been created
+	 * @throws SQLException If anything goes wrong
 	 */
 	private Connection connect() throws SQLException{
 		// Create the connection with the appropriate url and login credentials
@@ -342,6 +343,7 @@ public class Database{
 	 * @param sql The sql query string to run
 	 * @param convertFromResultSet The {@link ThrowingFunction} to use to run the query
 	 * @return The result from the query
+	 * @throws SQLException If anything goes wrong
 	 */
 	public <ResultType> ResultType executeQuery(String name, String sql, 
 			ThrowingFunction<ResultSet, ResultType, SQLException> convertFromResultSet) throws SQLException{
@@ -356,13 +358,15 @@ public class Database{
 	 * @param names The names to use for the updates (optional - used for debugging)
 	 * @param sqls The sql update statements to run
 	 * @return If it succeeded or not
+	 * @throws SQLException If anything goes wrong
 	 */
 	public boolean executeUpdates(String transactionName, List<String> names, List<String> sqls) throws SQLException{
 		return executeTransaction(Updates.createUpdates(transactionName, names, sqls));
 	}
 	
 	/**
-	 * Executes a single sql update and returns if it was a success. 
+	 * Executes a single sql update and returns if it was a success.
+	 * <br><br>
 	 * This version sends the name and statement to 
 	 * {@link #executeUpdates(String, List, List) the plural version} to create the
 	 * {@link Updates} object.
@@ -370,17 +374,44 @@ public class Database{
 	 * @param name The name to use for the update (optional - used for debugging)
 	 * @param sql The sql update statement to run
 	 * @return If it succeeded or not
+	 * @throws SQLException If anything goes wrong
 	 */
 	public boolean executeUpdate(String name, String sql) throws SQLException{
 		return executeUpdates(name, Collections.singletonList(name), Collections.singletonList(sql));
 	}
 	
+	/**
+	 * Executes a single sql insert statement.
+	 * <br><br>
+	 * This sends the table, cols, and values to
+	 * {@link SQLSyntaxUtil#formatInsertStatement(String, Collection, Collection)} to create the insert statement
+	 * and then uses {@link #executeUpdate(String, String)} to run it
+	 *
+	 * @param table The name of the table to insert into
+	 * @param cols The names of the columns to insert into
+	 * @param values The values to be inserted
+	 * @throws SQLException If anything goes wrong
+	 */
 	public void insert(String table, Collection<String> cols, Collection<Object> values) throws SQLException{
 		executeUpdate("Insert a " + table, SQLSyntaxUtil.formatInsertStatement(table, cols, values));
 	}
 	
-	public Integer insertAndGetID(String table, String id_str, Collection<String> cols, Collection<Object> values) throws SQLException{
-		return executeTransaction(InsertAndGetID.createInsertAndGetID(table, id_str, cols, values));
+	/**
+	 * Executes a sql insert statement and then performs a query to retrieve an id (useful if the ID is
+	 * auto-incremented).
+	 * <br><br>
+	 * To do this, a {@link InsertAndGetID} transaction object is created using the given parameters
+	 *
+	 * @param table The name of the table to insert into
+	 * @param idColumnName The column name for the ID column
+	 * @param cols The column names for the columns to use in the insert
+	 * @param values The values to be inserted
+	 * @return The ID found from the newly inserted data
+	 * @throws SQLException If anything goes wrong
+	 */
+	public Integer insertAndGetID(String table, String idColumnName, Collection<String> cols, Collection<Object> values)
+			throws SQLException{
+		return executeTransaction(InsertAndGetID.createInsertAndGetID(table, idColumnName, cols, values));
 	}
 	
 	/*
