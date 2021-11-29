@@ -9,6 +9,9 @@ import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +42,11 @@ public class SQLSyntaxUtil{
 		}else if(value instanceof Boolean b){
 			return b.toString();
 		}else{
-			return value.toString();
+			String str = value.toString();
+			if(value instanceof Time || value instanceof Date || value instanceof Timestamp){
+				str = "'" + str + "'";
+			}
+			return str;
 		}
 	}
 	

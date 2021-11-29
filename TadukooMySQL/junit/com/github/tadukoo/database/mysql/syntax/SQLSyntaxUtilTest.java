@@ -7,6 +7,9 @@ import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.util.ListUtil;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +31,22 @@ public class SQLSyntaxUtilTest{
 	@Test
 	public void testConvertValueToStringWithBoolean(){
 		assertEquals("true", SQLSyntaxUtil.convertValueToString(true));
+	}
+	
+	@Test
+	public void testConvertValueToStringWithTime(){
+		assertEquals("'16:20:00'", SQLSyntaxUtil.convertValueToString(Time.valueOf("16:20:00")));
+	}
+	
+	@Test
+	public void testConvertValueToStringWithDate(){
+		assertEquals("'2020-09-05'", SQLSyntaxUtil.convertValueToString(Date.valueOf("2020-09-05")));
+	}
+	
+	@Test
+	public void testConvertValueToStringWithTimestamp(){
+		assertEquals("'2020-09-05 20:01:00.0'",
+				SQLSyntaxUtil.convertValueToString(Timestamp.valueOf("2020-09-05 20:01:00")));
 	}
 	
 	@Test
