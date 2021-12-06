@@ -8,7 +8,7 @@ public interface ColumnDefinitionConstants{
 	String columnName = "Test";
 	int size = 10;
 	List<String> values = ListUtil.createList("Derp", "Plop");
-	String valuesString = "Derp, Plop";
+	String valuesString = "'Derp', 'Plop'";
 	int digits = 15;
 	int fractionalSecondsPrecision = 3;
 }

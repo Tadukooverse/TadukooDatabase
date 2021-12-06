@@ -755,7 +755,7 @@ public class ColumnDefinition{
 		if(ListUtil.isNotBlank(values)){
 			colDef.append('(');
 			for(String value: values){
-				colDef.append(value).append(", ");
+				colDef.append("'").append(value).append("', ");
 			}
 			// Delete extra comma
 			colDef.delete(colDef.length()-2, colDef.length());
