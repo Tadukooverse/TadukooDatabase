@@ -104,20 +104,6 @@ public class SQLInsertStatementTest{
 	}
 	
 	@Test
-	public void testBuilderMissingValuesAndSelectStmt(){
-		try{
-			stmt = SQLInsertStatement.builder()
-					.table(table)
-					.values()
-					.build();
-			fail();
-		}catch(IllegalArgumentException e){
-			assertEquals("Errors encountered while building SQLInsertStatement: \n" +
-					"Must specify either values or selectStmt!", e.getMessage());
-		}
-	}
-	
-	@Test
 	public void testBuilderColumnsAndValuesSizeMismatch(){
 		try{
 			stmt = SQLInsertStatement.builder()
@@ -146,7 +132,7 @@ public class SQLInsertStatementTest{
 			assertEquals("""
 					Errors encountered while building SQLInsertStatement:\s
 					table is required!
-					Must specify either values or selectStmt!""", e.getMessage());
+					Number of columns must equal number of values if specified!""", e.getMessage());
 		}
 	}
 	
@@ -154,6 +140,15 @@ public class SQLInsertStatementTest{
 	public void testToString(){
 		assertEquals("INSERT INTO " + table.toString() + " VALUES (" +
 				SQLSyntaxUtil.convertValueToString(value) + ")", stmt.toString());
+	}
+	
+	@Test
+	public void testToStringNoValues(){
+		stmt = SQLInsertStatement.builder()
+				.table(table)
+				.values()
+				.build();
+		assertEquals("INSERT INTO " + table + " VALUES ()", stmt.toString());
 	}
 	
 	@Test

@@ -114,13 +114,8 @@ public class SQLInsertStatement{
 				errors.add("table is required!");
 			}
 			
-			// Need either values or select statement
-			if(ListUtil.isBlank(values) && selectStmt == null){
-				errors.add("Must specify either values or selectStmt!");
-			}
-			
 			// if columns and values aren't empty, it must match the number of values
-			if(ListUtil.isNotBlank(columns) && ListUtil.isNotBlank(values) && columns.size() != values.size()){
+			if(ListUtil.isNotBlank(columns) && selectStmt == null && columns.size() != values.size()){
 				errors.add("Number of columns must equal number of values if specified!");
 			}
 			
@@ -224,11 +219,13 @@ public class SQLInsertStatement{
 		}else{
 			// Add values
 			statement.append("VALUES (");
-			for(Object value: values){
-				statement.append(SQLSyntaxUtil.convertValueToString(value)).append(", ");
+			if(ListUtil.isNotBlank(values)){
+				for(Object value: values){
+					statement.append(SQLSyntaxUtil.convertValueToString(value)).append(", ");
+				}
+				// Remove last unnecessary comma
+				statement.delete(statement.length() - 2, statement.length());
 			}
-			// Remove last unnecessary comma
-			statement.delete(statement.length() - 2, statement.length());
 			statement.append(')');
 		}
 		
