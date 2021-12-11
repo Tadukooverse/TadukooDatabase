@@ -298,15 +298,17 @@ public class SQLCreateStatement{
 				stmt.append(column).append(", ");
 			}
 			// Remove last comma
-			stmt.delete(stmt.length()-2, stmt.length());
-			stmt.append(')');
-		}
-		
-		// If we have foreign keys, add them to the statement
-		if(ListUtil.isNotBlank(foreignKeys)){
-			for(ForeignKeyConstraint foreignKey: foreignKeys){
-				stmt.append(' ').append(foreignKey);
+			stmt.delete(stmt.length() - 2, stmt.length());
+			
+			// If we have foreign keys, add them to the statement
+			if(ListUtil.isNotBlank(foreignKeys)){
+				for(ForeignKeyConstraint foreignKey: foreignKeys){
+					stmt.append(", ").append(foreignKey);
+				}
 			}
+			
+			// Close parentheses
+			stmt.append(')');
 		}
 		
 		return stmt.toString();

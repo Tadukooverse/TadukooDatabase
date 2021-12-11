@@ -306,7 +306,8 @@ public class SQLCreateStatementTest{
 				.columns(col1)
 				.foreignKey(foreignKey)
 				.build();
-		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 +") " + foreignKey, stmt.toString());
+		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 + ", " + foreignKey + ")",
+				stmt.toString());
 	}
 	
 	@Test
@@ -334,8 +335,8 @@ public class SQLCreateStatementTest{
 				.foreignKey(foreignKey)
 				.foreignKey(foreignKey2)
 				.build();
-		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 +") " + foreignKey +
-				" " + foreignKey2, stmt.toString());
+		assertEquals("CREATE " + SQLType.TABLE + " " + tableName + "(" + col1 + ", " + foreignKey +
+				", " + foreignKey2 + ")", stmt.toString());
 	}
 	
 	@Test
