@@ -79,7 +79,7 @@ public class SQLSyntaxUtilTest extends DatabaseConnectionTest{
 	}
 	
 	/**
-	 * Tests the {@link SQLSyntaxUtil#getValueBasedOnColumnDefinition(ResultSet, ColumnDefinition)} method
+	 * Tests the {@link SQLSyntaxUtil#getValueBasedOnColumnDefinition(ResultSet, String, ColumnDefinition)} method
 	 * using the given {@link ColumnDefinition} and value
 	 *
 	 * @param columnDef The {@link ColumnDefinition} to use for testing
@@ -113,7 +113,7 @@ public class SQLSyntaxUtilTest extends DatabaseConnectionTest{
 		// Run the query
 		Object actualValue = db.executeQuery("Test grab value", query, resultSet -> {
 			resultSet.next();
-			return SQLSyntaxUtil.getValueBasedOnColumnDefinition(resultSet, columnDef);
+			return SQLSyntaxUtil.getValueBasedOnColumnDefinition(resultSet, null, columnDef);
 		});
 		
 		// Drop the table
@@ -129,6 +129,55 @@ public class SQLSyntaxUtilTest extends DatabaseConnectionTest{
 		}else{
 			assertEquals(value, actualValue);
 		}
+	}
+	
+	@Test
+	public void testExtractValueFromResultSetWithTable() throws SQLException{
+		ColumnDefinition columnDef = ColumnDefinition.builder()
+				.columnName("Test")
+				.character()
+				.defaultLength()
+				.build();
+		char value = 'T';
+		
+		// Create the Table
+		String tableName = "TestResultSet";
+		db.executeUpdate("Create Table", SQLCreateStatement.builder()
+				.table()
+				.tableName(tableName)
+				.columns(columnDef)
+				.build()
+				.toString());
+		
+		// Add a row to the table with the value
+		db.insert(tableName, ListUtil.createList(columnDef.getColumnName()), ListUtil.createList(value));
+		
+		// Create the query
+		String query = SQLSelectStatement.builder()
+				.returnColumns(ColumnRef.builder()
+						.columnName(columnDef.getColumnName())
+						.build())
+				.fromTables(TableRef.builder()
+						.tableName(tableName)
+						.build())
+				.build()
+				.toString();
+		
+		// Run the query
+		Object actualValue = db.executeQuery("Test grab value", query, resultSet -> {
+			resultSet.next();
+			return SQLSyntaxUtil.getValueBasedOnColumnDefinition(resultSet, tableName, columnDef);
+		});
+		
+		// Drop the table
+		db.executeUpdate("Drop Table", SQLDropStatement.builder()
+				.table()
+				.name(tableName)
+				.build()
+				.toString());
+		
+		// Check the value
+		assertEquals(value, actualValue);
 	}
 	
 	@Test

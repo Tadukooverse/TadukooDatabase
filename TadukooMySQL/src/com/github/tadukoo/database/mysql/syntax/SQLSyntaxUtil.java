@@ -11,6 +11,7 @@ import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLUpdateStatement;
 import com.github.tadukoo.util.ByteUtil;
+import com.github.tadukoo.util.StringUtil;
 
 import java.math.BigInteger;
 import java.sql.Date;
@@ -64,38 +65,43 @@ public class SQLSyntaxUtil{
 	 * Extracts a value from the given {@link ResultSet} based on the info in the given {@link ColumnDefinition}
 	 *
 	 * @param resultSet The {@link ResultSet} to extract data from
+	 * @param tableName The name of the table (can be blank)
 	 * @param columnDef The {@link ColumnDefinition} to use for info
 	 * @return The extracted value
 	 * @throws SQLException If anything goes wrong
 	 */
-	public static Object getValueBasedOnColumnDefinition(ResultSet resultSet, ColumnDefinition columnDef)
+	public static Object getValueBasedOnColumnDefinition(ResultSet resultSet, String tableName, ColumnDefinition columnDef)
 			throws SQLException{
+		String columnName = columnDef.getColumnName();
+		if(StringUtil.isNotBlank(tableName)){
+			columnName = tableName + "." + columnName;
+		}
 		return switch(columnDef.getDataType()){
-			case CHAR -> resultSet.getString(columnDef.getColumnName()).charAt(0);
+			case CHAR -> resultSet.getString(columnName).charAt(0);
 			case VARCHAR, TINYTEXT, TEXT, MEDIUMTEXT, LONGTEXT, ENUM, SET ->
-					resultSet.getString(columnDef.getColumnName());
+					resultSet.getString(columnName);
 			case BINARY, VARBINARY, TINYBLOB, BLOB, MEDIUMBLOB, LONGBLOB, BIT ->
-					resultSet.getBytes(columnDef.getColumnName());
-			case TINYINT, SMALLINT, MEDIUMINT -> resultSet.getInt(columnDef.getColumnName());
-			case BOOL -> resultSet.getBoolean(columnDef.getColumnName());
+					resultSet.getBytes(columnName);
+			case TINYINT, SMALLINT, MEDIUMINT -> resultSet.getInt(columnName);
+			case BOOL -> resultSet.getBoolean(columnName);
 			case INTEGER -> {
 				// Apparently a ternary operator doesn't work here ;( (will always use the Long version)
 				if(columnDef.isUnsigned()){
-					yield resultSet.getLong(columnDef.getColumnName());
+					yield resultSet.getLong(columnName);
 				}else{
-					yield resultSet.getInt(columnDef.getColumnName());
+					yield resultSet.getInt(columnName);
 				}
 			}
 			case BIGINT -> columnDef.isUnsigned()
-					?new BigInteger(resultSet.getString(columnDef.getColumnName()))
-					:resultSet.getLong(columnDef.getColumnName());
-			case FLOAT -> resultSet.getFloat(columnDef.getColumnName());
-			case DOUBLE -> resultSet.getDouble(columnDef.getColumnName());
-			case DECIMAL -> resultSet.getBigDecimal(columnDef.getColumnName());
-			case DATE -> resultSet.getDate(columnDef.getColumnName());
-			case YEAR -> resultSet.getShort(columnDef.getColumnName());
-			case DATETIME, TIMESTAMP -> resultSet.getTimestamp(columnDef.getColumnName());
-			case TIME -> resultSet.getTime(columnDef.getColumnName());
+					?new BigInteger(resultSet.getString(columnName))
+					:resultSet.getLong(columnName);
+			case FLOAT -> resultSet.getFloat(columnName);
+			case DOUBLE -> resultSet.getDouble(columnName);
+			case DECIMAL -> resultSet.getBigDecimal(columnName);
+			case DATE -> resultSet.getDate(columnName);
+			case YEAR -> resultSet.getShort(columnName);
+			case DATETIME, TIMESTAMP -> resultSet.getTimestamp(columnName);
+			case TIME -> resultSet.getTime(columnName);
 		};
 	}
 	
