@@ -5,34 +5,41 @@
 	<parent>
 		<groupId>com.github.tadukoo.database</groupId>
 		<artifactId>TadukooDatabaseParent</artifactId>
-		<version>0.2.2-Alpha</version>
+		<version>0.3-Alpha</version>
 	</parent>
 	<artifactId>TadukooMySQL</artifactId>
 	<dependencies>
-		<dependency>
-			<groupId>${tadukoo.util.groupID}</groupId>
-			<artifactId>${tadukoo.util.lang.artifactID}</artifactId>
-		</dependency>
+		<!-- Tadukoo Util Dependencies -->
 		<dependency>
 			<groupId>${tadukoo.util.groupID}</groupId>
 			<artifactId>${tadukoo.util.functions.artifactID}</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${tadukoo.util.groupID}</groupId>
+			<artifactId>${tadukoo.util.util.artifactID}</artifactId>
+		</dependency>
+		<!-- MySQL Connector -->
+		<dependency>
+			<groupId>${mariadb.groupID}</groupId>
+			<artifactId>${mariadb.java.artifactID}</artifactId>
+		</dependency>
+		<!-- JUnit Dependencies -->
+		<dependency>
+			<groupId>${junit.jupiter.groupID}</groupId>
+			<artifactId>${junit.jupiter.artifactID}</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${junit.platform.groupID}</groupId>
+			<artifactId>${junit.platform.artifactID}</artifactId>
+		</dependency>
+		<!-- Tadukoo JUnit -->
+		<dependency>
+			<groupId>${tadukoo.junit.groupID}</groupId>
+			<artifactId>${tadukoo.junit.junit.artifactID}</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>${directory.source}</sourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-			</plugin>
-		</plugins>
+		<testSourceDirectory>${directory.test}</testSourceDirectory>
 	</build>
 </project>

@@ -1,5 +1,5 @@
 # TadukooDatabase
-a collection of utilities used for interacting with databases.
+A collection of utilities used for interacting with databases.
 
 #### Table of Contents
 * [Modules](#modules)
