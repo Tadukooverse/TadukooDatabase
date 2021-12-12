@@ -414,6 +414,27 @@ public class Database{
 		return executeTransaction(InsertAndGetID.createInsertAndGetID(table, idColumnName, cols, values));
 	}
 	
+	/**
+	 * Executes a single sql update statement
+	 * <br><br>
+	 * This sends the table, cols, values, whereCols, and whereValues to
+	 * {@link SQLSyntaxUtil#formatUpdateStatement(String, Collection, Collection, Collection, Collection)} to create
+	 * the update statement and then uses {@link #executeUpdate(String, String)} to run it
+	 *
+	 * @param table The name of the table to be updated
+	 * @param cols The names of the columns to be updated
+	 * @param values The values to use in the update
+	 * @param whereCols The names of the columns for the where statement (can be empty/null)
+	 * @param whereValues The values to use for the where statement (can be empty/null)
+	 * @throws SQLException If anything goes wrong
+	 */
+	public void update(
+			String table, Collection<String> cols, Collection<Object> values,
+			Collection<String> whereCols, Collection<Object> whereValues) throws SQLException{
+		executeUpdate("Update a " + table,
+				SQLSyntaxUtil.formatUpdateStatement(table, cols, values, whereCols, whereValues));
+	}
+	
 	/*
 	 * Builder interfaces
 	 */

@@ -145,4 +145,99 @@ public class DatabaseExecuteTests extends DatabaseConnectionTest{
 		assertEquals(1, db.insertAndGetID("Test", "id",
 				ListUtil.createList("other"), ListUtil.createList(42)));
 	}
+	
+	@Test
+	public void testUpdate() throws SQLException{
+		// Try dropping the Test table (should succeed due to IF EXISTS)
+		assertTrue(db.executeUpdate("Drop Test", SQLDropStatement.builder()
+				.table()
+				.ifExists()
+				.name("Test")
+				.build()
+				.toString()));
+		
+		// Create the table if it doesn't exist
+		assertTrue(db.executeUpdate("Create test table",
+				SQLCreateStatement.builder()
+						.table()
+						.ifTableNotExists()
+						.tableName("Test")
+						.columns(ColumnDefinition.builder()
+								.columnName("id")
+								.integer()
+								.defaultSize()
+								.build())
+						.build()
+						.toString()));
+		
+		// Run the insert
+		db.insert("Test", ListUtil.createList("id"), ListUtil.createList(42));
+		
+		assertEquals(42, db.executeQuery("Find Tests", SQLSelectStatement.builder()
+						.fromTables(TableRef.builder()
+								.tableName("Test")
+								.build())
+						.build()
+						.toString(),
+				CommonResultSetConverters::singleInteger));
+		
+		// Run the update
+		db.update("Test", ListUtil.createList("id"), ListUtil.createList(14), null, null);
+		
+		assertEquals(14, db.executeQuery("Find Tests", SQLSelectStatement.builder()
+						.fromTables(TableRef.builder()
+								.tableName("Test")
+								.build())
+						.build()
+						.toString(),
+				CommonResultSetConverters::singleInteger));
+	}
+	
+	@Test
+	public void testUpdateWithWhere() throws SQLException{
+		// Try dropping the Test table (should succeed due to IF EXISTS)
+		assertTrue(db.executeUpdate("Drop Test", SQLDropStatement.builder()
+				.table()
+				.ifExists()
+				.name("Test")
+				.build()
+				.toString()));
+		
+		// Create the table if it doesn't exist
+		assertTrue(db.executeUpdate("Create test table",
+				SQLCreateStatement.builder()
+						.table()
+						.ifTableNotExists()
+						.tableName("Test")
+						.columns(ColumnDefinition.builder()
+								.columnName("id")
+								.integer()
+								.defaultSize()
+								.build())
+						.build()
+						.toString()));
+		
+		// Run the insert
+		db.insert("Test", ListUtil.createList("id"), ListUtil.createList(42));
+		
+		assertEquals(42, db.executeQuery("Find Tests", SQLSelectStatement.builder()
+						.fromTables(TableRef.builder()
+								.tableName("Test")
+								.build())
+						.build()
+						.toString(),
+				CommonResultSetConverters::singleInteger));
+		
+		// Run the update
+		db.update("Test", ListUtil.createList("id"), ListUtil.createList(14),
+				ListUtil.createList("id"), ListUtil.createList(42));
+		
+		assertEquals(14, db.executeQuery("Find Tests", SQLSelectStatement.builder()
+						.fromTables(TableRef.builder()
+								.tableName("Test")
+								.build())
+						.build()
+						.toString(),
+				CommonResultSetConverters::singleInteger));
+	}
 }
