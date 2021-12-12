@@ -2,6 +2,7 @@ package com.github.tadukoo.database.mysql.syntax;
 
 import com.github.tadukoo.database.mysql.Database;
 import com.github.tadukoo.database.mysql.DatabaseConnectionTest;
+import com.github.tadukoo.database.mysql.syntax.conditional.Conditional;
 import com.github.tadukoo.database.mysql.syntax.conditional.ConditionalStatement;
 import com.github.tadukoo.database.mysql.syntax.conditional.SQLOperator;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
@@ -20,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -513,10 +515,74 @@ public class SQLSyntaxUtilTest extends DatabaseConnectionTest{
 	}
 	
 	@Test
+	public void testMakeConditionalSingleValueNotSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test"), ListUtil.createList("42"),
+				false);
+		assertEquals("Test = '42'", cond.toString());
+	}
+	
+	@Test
+	public void testMakeConditionalSingleValueSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test"), ListUtil.createList("42"),
+				true);
+		assertEquals("Test LIKE '%42%'", cond.toString());
+	}
+	
+	@Test
+	public void testMakeConditionalTwoValueNotSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test", "Derp"),
+				ListUtil.createList("Yep", 42), false);
+		assertEquals("(Test = 'Yep') AND Derp = 42", cond.toString());
+	}
+	
+	@Test
+	public void testMakeConditionalTwoValueSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test", "Derp"),
+				ListUtil.createList("Yep", 42), true);
+		assertEquals("(Test LIKE '%Yep%') AND Derp = 42", cond.toString());
+	}
+	
+	@Test
+	public void testMakeConditionalThreeValueNotSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test", "Derp", "Plop"),
+				ListUtil.createList("Yep", 42, true), false);
+		assertEquals("((Test = 'Yep') AND Derp = 42) AND Plop = true", cond.toString());
+	}
+	
+	@Test
+	public void testMakeConditionalThreeValueSearch(){
+		Conditional cond = SQLSyntaxUtil.makeConditional(ListUtil.createList("Test", "Derp", "Plop"),
+				ListUtil.createList("Yep", 42, true), true);
+		assertEquals("((Test LIKE '%Yep%') AND Derp = 42) AND Plop = true", cond.toString());
+	}
+	
+	@Test
 	public void testFormatInsertStatement(){
 		String insertStmt = SQLSyntaxUtil.formatInsertStatement("Test", ListUtil.createList("Derp", "Plop"),
 				ListUtil.createList(42, true));
 		assertEquals("INSERT INTO Test (Derp, Plop) VALUES (42, true)", insertStmt);
+	}
+	
+	@Test
+	public void testFormatUpdateStatementNoWhere(){
+		String updateStmt = SQLSyntaxUtil.formatUpdateStatement("Test",
+				ListUtil.createList("Derp", "Plop"), ListUtil.createList("Yep", 42), null, null);
+		assertEquals("UPDATE Test SET Derp = 'Yep', Plop = 42", updateStmt);
+	}
+	
+	@Test
+	public void testFormatUpdateStatementNoWhereEmpty(){
+		String updateStmt = SQLSyntaxUtil.formatUpdateStatement("Test",
+				ListUtil.createList("Derp", "Plop"), ListUtil.createList("Yep", 42), null, new ArrayList<>());
+		assertEquals("UPDATE Test SET Derp = 'Yep', Plop = 42", updateStmt);
+	}
+	
+	@Test
+	public void testFormatUpdateStatementWithWhere(){
+		String updateStmt = SQLSyntaxUtil.formatUpdateStatement("Test",
+				ListUtil.createList("Derp", "Plop"), ListUtil.createList("Yep", 42),
+				ListUtil.createList("Test"), ListUtil.createList(true));
+		assertEquals("UPDATE Test SET Derp = 'Yep', Plop = 42 WHERE Test = true", updateStmt);
 	}
 	
 	@Test

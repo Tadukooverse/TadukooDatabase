@@ -2,12 +2,14 @@ package com.github.tadukoo.database.mysql.syntax;
 
 import com.github.tadukoo.database.mysql.syntax.conditional.Conditional;
 import com.github.tadukoo.database.mysql.syntax.conditional.ConditionalStatement;
+import com.github.tadukoo.database.mysql.syntax.conditional.EqualsStatement;
 import com.github.tadukoo.database.mysql.syntax.conditional.SQLConjunctiveOperator;
 import com.github.tadukoo.database.mysql.syntax.conditional.SQLOperator;
 import com.github.tadukoo.database.mysql.syntax.reference.ColumnRef;
 import com.github.tadukoo.database.mysql.syntax.reference.TableRef;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
+import com.github.tadukoo.database.mysql.syntax.statement.SQLUpdateStatement;
 import com.github.tadukoo.util.ByteUtil;
 
 import java.math.BigInteger;
@@ -16,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -159,6 +162,44 @@ public class SQLSyntaxUtil{
 	}
 	
 	/**
+	 * Makes a {@link Conditional} using the given parameters
+	 *
+	 * @param columnNames The names of the columns to use in the {@link Conditional}
+	 * @param values The values to use in the {@link Conditional}
+	 * @param search Whether to consider this a search or not
+	 * @return The {@link Conditional} that was made from the parameters
+	 */
+	public static Conditional makeConditional(Collection<String> columnNames, Collection<Object> values, boolean search){
+		if(values.size() == 1){
+			return Conditional.builder()
+					.firstCondStmt(makeConditionalStmt(search, columnNames.iterator().next(), values.iterator().next()))
+					.build();
+		}else{
+			Conditional cond = null;
+			// Iterate over the columnNames and values
+			Iterator<String> colIt = columnNames.iterator();
+			Iterator<Object> valIt = values.iterator();
+			while(colIt.hasNext()){
+				ConditionalStatement condStmt = makeConditionalStmt(search, colIt.next(), valIt.next());
+				if(cond == null){
+					// If this is the first one, build a new conditional with just the first statement
+					cond = Conditional.builder()
+							.firstCondStmt(condStmt)
+							.build();
+				}else{
+					// If we already started the conditional, and this statement with the existing conditional
+					cond = Conditional.builder()
+							.firstCond(cond)
+							.operator(SQLConjunctiveOperator.AND)
+							.secondCondStmt(condStmt)
+							.build();
+				}
+			}
+			return cond;
+		}
+	}
+	
+	/**
 	 * Creates an Insert statement for the given parameters
 	 *
 	 * @param table The name of the table to insert into
@@ -179,6 +220,48 @@ public class SQLSyntaxUtil{
 		
 		// Return the insert statement string
 		return insertStmt.toString();
+	}
+	
+	/**
+	 * Creates an Update statement for the given parameters
+	 *
+	 * @param table The name of the table to update
+	 * @param columnNames The names of the columns to be updated
+	 * @param values The values to be updated
+	 * @param whereColNames The names of the columns for the where statement
+	 * @param whereValues The values for the where statement
+	 * @return The SQL text for the update statement
+	 */
+	public static String formatUpdateStatement(
+			String table, Collection<String> columnNames, Collection<Object> values,
+			Collection<String> whereColNames, Collection<Object> whereValues){
+		// Convert the columns to ColumnRefs
+		List<ColumnRef> columns = makeColumnRefs(columnNames);
+		
+		// Make the Set Statements
+		List<EqualsStatement> setStmts = new ArrayList<>();
+		Iterator<ColumnRef> columnIt = columns.iterator();
+		Iterator<Object> valuesIt = values.iterator();
+		while(columnIt.hasNext()){
+			setStmts.add(new EqualsStatement(columnIt.next(), valuesIt.next()));
+		}
+		
+		// Start the update statement
+		SQLUpdateStatement.WhereStatementAndBuild updateStmtStart = SQLUpdateStatement.builder()
+				.table(TableRef.builder().tableName(table).build())
+				.setStatements(setStmts);
+		
+		// Add the where statement if we have it
+		SQLUpdateStatement updateStmt;
+		if(whereValues == null || whereValues.isEmpty()){
+			updateStmt = updateStmtStart.build();
+		}else{
+				updateStmt = updateStmtStart.whereStatement(makeConditional(whereColNames, whereValues, false))
+					.build();
+		}
+		
+		// Return the update statement string
+		return updateStmt.toString();
 	}
 	
 	/**
@@ -210,32 +293,7 @@ public class SQLSyntaxUtil{
 				.collect(Collectors.toList());
 		
 		// Make the conditional
-		Conditional cond = null;
-		if(values.size() == 1){
-			cond = Conditional.builder()
-					.firstCondStmt(makeConditionalStmt(search, cols.iterator().next(), values.iterator().next()))
-					.build();
-		}else{
-			// Iterate over the columns and values
-			Iterator<String> colIt = cols.iterator();
-			Iterator<Object> valIt = values.iterator();
-			while(colIt.hasNext()){
-				ConditionalStatement condStmt = makeConditionalStmt(search, colIt.next(), valIt.next());
-				if(cond == null){
-					// If this is the first one, build a new conditional with just the first statement
-					cond = Conditional.builder()
-							.firstCondStmt(condStmt)
-							.build();
-				}else{
-					// If we already started the conditional, and this statement with the existing conditional
-					cond = Conditional.builder()
-							.firstCond(cond)
-							.operator(SQLConjunctiveOperator.AND)
-							.secondCondStmt(condStmt)
-							.build();
-				}
-			}
-		}
+		Conditional cond = makeConditional(cols, values, search);
 		
 		// Build the select statement
 		SQLSelectStatement selectStmt = SQLSelectStatement.builder()
