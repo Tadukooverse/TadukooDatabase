@@ -270,6 +270,7 @@ public interface DatabasePojo extends MappedPojo{
 	 *
 	 * @param database The {@link Database} to store values in
 	 * @param storeSubPojos Whether to store values on subPojos or not
+	 * @return The new ID for the {@link DatabasePojo} if it was freshly inserted to the {@link Database}
 	 * @throws SQLException If anything goes wrong in storing values
 	 */
 	default Integer storeValues(Database database, boolean storeSubPojos) throws SQLException{

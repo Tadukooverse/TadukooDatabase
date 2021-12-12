@@ -9,6 +9,12 @@ import com.github.tadukoo.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SQL Alter Statement represents a MySQL Alter statement
+ *
+ * @author Logan Ferree (Tadukoo)
+ * @version Alpha v.0.3
+ */
 public class SQLAlterStatement{
 	
 	/**
