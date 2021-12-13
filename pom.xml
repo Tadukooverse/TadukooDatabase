@@ -19,7 +19,8 @@
 	<properties>
 		<!-- Info -->
 		<shortName>TadukooDatabase</shortName>
-		<tadukoo.util.version>0.5.1-Beta</tadukoo.util.version>
+		<tadukoo.util.version>0.5.2-Beta-SNAPSHOT</tadukoo.util.version>
+		<tadukoo.junit.version>0.2-Alpha-SNAPSHOT</tadukoo.junit.version>
 		
 		<!-- MariaDB Versions -->
 		<mariadb.version>2.7.3</mariadb.version>
