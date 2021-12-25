@@ -38,6 +38,12 @@
 				<artifactId>${mariadb.java.artifactID}</artifactId>
 				<version>${mariadb.java.version}</version>
 			</dependency>
+			<!-- Tadukoo MySQL -->
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>TadukooMySQL</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 </project>
