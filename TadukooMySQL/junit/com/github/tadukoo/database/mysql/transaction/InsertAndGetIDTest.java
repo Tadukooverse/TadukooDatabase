@@ -5,7 +5,7 @@ import com.github.tadukoo.database.mysql.syntax.ColumnDefinition;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLCreateStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLDropStatement;
 import com.github.tadukoo.database.mysql.transaction.update.Updates;
-import com.github.tadukoo.junit.logger.JUnitEasyLogger;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLogger;
 import com.github.tadukoo.util.ListUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
