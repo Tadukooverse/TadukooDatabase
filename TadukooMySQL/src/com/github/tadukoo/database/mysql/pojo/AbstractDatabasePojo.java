@@ -20,6 +20,8 @@ import java.util.Map;
 public abstract class AbstractDatabasePojo implements DatabasePojo{
 	/** The Map of items in this pojo */
 	private final Map<String, Object> itemMap;
+	/** The List of {@link ColumnDefinition column definition} keys for this pojo */
+	private final List<String> columnDefKeys;
 	/** The Map of {@link ColumnDefinition column definitions} for this pojo */
 	private final Map<String, ColumnDefinition> columnDefMap;
 	/** The Map of {@link SubPojoDefinition subPojo definitions} for this pojo */
@@ -33,6 +35,7 @@ public abstract class AbstractDatabasePojo implements DatabasePojo{
 	 */
 	protected AbstractDatabasePojo(){
 		itemMap = new HashMap<>();
+		columnDefKeys = new ArrayList<>();
 		columnDefMap = new HashMap<>();
 		subPojoDefs = new HashMap<>();
 		foreignKeys = new ArrayList<>();
@@ -47,6 +50,7 @@ public abstract class AbstractDatabasePojo implements DatabasePojo{
 	 */
 	protected AbstractDatabasePojo(MappedPojo pojo){
 		itemMap = pojo.getMap();
+		columnDefKeys = new ArrayList<>();
 		columnDefMap = new HashMap<>();
 		subPojoDefs = new HashMap<>();
 		foreignKeys = new ArrayList<>();
@@ -59,6 +63,11 @@ public abstract class AbstractDatabasePojo implements DatabasePojo{
 		return itemMap;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
+	public List<String> getColumnDefKeys(){
+		return columnDefKeys;
+	}
 	
 	/** {@inheritDoc} */
 	@Override

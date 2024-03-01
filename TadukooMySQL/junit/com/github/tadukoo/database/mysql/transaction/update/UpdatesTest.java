@@ -5,6 +5,8 @@ import com.github.tadukoo.database.mysql.syntax.statement.SQLCreateStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLDropStatement;
 import com.github.tadukoo.util.junit.logger.JUnitEasyLogger;
 import com.github.tadukoo.util.ListUtil;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerAssertEntries;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -85,14 +87,14 @@ public class UpdatesTest{
 		Database db = setupDB();
 		
 		assertTrue(db.executeTransaction(updates));
-		JUnitEasyLogger.assertEntries(ListUtil.createList(
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+		JUnitEasyLoggerAssertEntries.assertEntries(ListUtil.createList(
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database transaction", null)
 		), logger);
 		
@@ -106,22 +108,22 @@ public class UpdatesTest{
 		
 		assertTrue(db.executeTransaction(updates));
 		
-		JUnitEasyLogger.assertEntries(ListUtil.createList(
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+		JUnitEasyLoggerAssertEntries.assertEntries(ListUtil.createList(
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Drop Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Drop Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Drop Database " + databaseName + " statement", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Drop Database transaction", null)
 		), logger);
 	}
@@ -134,10 +136,10 @@ public class UpdatesTest{
 				ListUtil.createList(createDBString));
 		
 		assertTrue(db.executeTransaction(updates));
-		JUnitEasyLogger.assertEntries(ListUtil.createList(
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+		JUnitEasyLoggerAssertEntries.assertEntries(ListUtil.createList(
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database transaction", null)
 		), logger);
 		
@@ -150,14 +152,14 @@ public class UpdatesTest{
 		
 		assertTrue(db.executeTransaction(updates));
 		
-		JUnitEasyLogger.assertEntries(ListUtil.createList(
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+		JUnitEasyLoggerAssertEntries.assertEntries(ListUtil.createList(
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Create Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Starting Drop Database transaction", null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO,
+				new JUnitEasyLoggerEntry(Level.INFO,
 						"Finished Drop Database transaction", null)
 		), logger);
 	}

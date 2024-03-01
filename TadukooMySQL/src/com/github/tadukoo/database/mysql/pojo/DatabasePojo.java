@@ -42,6 +42,11 @@ public interface DatabasePojo extends MappedPojo{
 	String getIDColumnName();
 	
 	/**
+	 * @return A List of all the {@link ColumnDefinition column definition} keys in this pojo
+	 */
+	List<String> getColumnDefKeys();
+	
+	/**
 	 * @return A Map of all the {@link ColumnDefinition column definitions} in this pojo
 	 */
 	Map<String, ColumnDefinition> getColumnDefs();
@@ -114,6 +119,7 @@ public interface DatabasePojo extends MappedPojo{
 	default void addColumnDef(ColumnDefinition columnDef, Object value){
 		String key = columnDef.getColumnName();
 		setItem(key, value);
+		getColumnDefKeys().add(key);
 		getColumnDefs().put(key, columnDef);
 	}
 	
@@ -122,13 +128,6 @@ public interface DatabasePojo extends MappedPojo{
 	 * {@link ColumnDefinition column definitions}
 	 */
 	void setDefaultColumnDefs();
-	
-	/**
-	 * @return The Set of {@link ColumnDefinition column definition} keys
-	 */
-	default Set<String> getColumnDefKeys(){
-		return getColumnDefs().keySet();
-	}
 	
 	/**
 	 * Retrieve a {@link ColumnDefinition} from the Map using the given key
@@ -147,11 +146,16 @@ public interface DatabasePojo extends MappedPojo{
 	 * @throws SQLException If something goes wrong in creating the table
 	 */
 	default void createTable(Database database) throws SQLException{
+		// Grab columns in order for this
+		List<ColumnDefinition> columns = getColumnDefKeys().stream()
+				.map(this::getColumnDefByKey)
+				.toList();
+		
 		// Start the create statement
 		SQLCreateStatement.ForeignKeysOrBuild createStmt = SQLCreateStatement.builder()
 				.table()
 				.tableName(getTableName())
-				.columns(new ArrayList<>(getColumnDefs().values()));
+				.columns(columns);
 		
 		// Add foreign key constraints
 		for(ForeignKeyConstraint foreignKey: getForeignKeys()){
@@ -243,7 +247,7 @@ public interface DatabasePojo extends MappedPojo{
 	default <P extends DatabasePojo> ThrowingFunction<ResultSet, List<P>, SQLException> getResultSetListFunc(
 			Class<P> clazz){
 		Map<String, ColumnDefinition> columnDefs = getColumnDefs();
-		Set<String> columnDefKeys = getColumnDefKeys();
+		List<String> columnDefKeys = getColumnDefKeys();
 		String tableName = getTableName();
 		return resultSet -> {
 			List<P> pojos = new ArrayList<>();
@@ -339,7 +343,7 @@ public interface DatabasePojo extends MappedPojo{
 	default <P extends DatabasePojo> List<P> doSearch(
 			Database database, Class<P> clazz, Collection<String> subPojosToUse) throws SQLException{
 		// Setup the collections we'll be using for the search
-		Set<String> columnDefKeys = getColumnDefKeys();
+		List<String> columnDefKeys = getColumnDefKeys();
 		List<String> tables = ListUtil.createList(getTableName());
 		List<String> columnsToReturn = new ArrayList<>();
 		List<String> columnDefsToUse = new ArrayList<>();
@@ -367,7 +371,7 @@ public interface DatabasePojo extends MappedPojo{
 					
 					// Check for values on the subPojo to include and track if we use it
 					boolean useSubPojo = false;
-					Set<String> subPojoColDefKeys = subPojo.getColumnDefKeys();
+					List<String> subPojoColDefKeys = subPojo.getColumnDefKeys();
 					for(String columnDefKey: subPojoColDefKeys){
 						Object value = subPojo.getItem(columnDefKey);
 						if(value != null){

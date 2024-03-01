@@ -9,8 +9,9 @@ import com.github.tadukoo.database.mysql.syntax.statement.SQLCreateStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLInsertStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLSelectStatement;
 import com.github.tadukoo.database.mysql.transaction.update.Updates;
-import com.github.tadukoo.util.junit.logger.JUnitEasyLogger;
 import com.github.tadukoo.util.ListUtil;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerAssertEntries;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -81,10 +82,10 @@ public class QueryTest extends DatabaseConnectionTest{
 		assertEquals(42, db.executeTransaction(query));
 		
 		// Check the last two entries in the logger
-		List<JUnitEasyLogger.JUnitEasyLoggerEntry> entries = logger.getEntries();
-		JUnitEasyLogger.assertEntries(ListUtil.createList(
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Running query " + name, null),
-				new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Finished query " + name, null)),
+		List<JUnitEasyLoggerEntry> entries = logger.getEntries();
+		JUnitEasyLoggerAssertEntries.assertEntries(ListUtil.createList(
+				new JUnitEasyLoggerEntry(Level.INFO, "Running query " + name, null),
+				new JUnitEasyLoggerEntry(Level.INFO, "Finished query " + name, null)),
 				ListUtil.createList(entries.get(entries.size()-2), entries.get(entries.size()-1)));
 	}
 }

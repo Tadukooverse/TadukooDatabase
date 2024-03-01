@@ -5,8 +5,9 @@ import com.github.tadukoo.database.mysql.syntax.ColumnDefinition;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLCreateStatement;
 import com.github.tadukoo.database.mysql.syntax.statement.SQLDropStatement;
 import com.github.tadukoo.database.mysql.transaction.update.Updates;
-import com.github.tadukoo.util.junit.logger.JUnitEasyLogger;
 import com.github.tadukoo.util.ListUtil;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerAssertEntries;
+import com.github.tadukoo.util.junit.logger.JUnitEasyLoggerEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -152,16 +153,16 @@ public class InsertAndGetIDTest extends DatabaseConnectionTest{
 		assertEquals(1, db.executeTransaction(insertAndGetID));
 		
 		// Verify some log entries
-		List<JUnitEasyLogger.JUnitEasyLoggerEntry> entries = logger.getEntries();
-		JUnitEasyLogger.assertEntries(
+		List<JUnitEasyLoggerEntry> entries = logger.getEntries();
+		JUnitEasyLoggerAssertEntries.assertEntries(
 				ListUtil.createList(
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Starting execution of " +
+						new JUnitEasyLoggerEntry(Level.INFO, "Starting execution of " +
 								insertAndGetID.getTransactionName(), null),
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, insertAndGetID.getInsertString(),
+						new JUnitEasyLoggerEntry(Level.INFO, insertAndGetID.getInsertString(),
 								null),
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, insertAndGetID.getSelectString(),
+						new JUnitEasyLoggerEntry(Level.INFO, insertAndGetID.getSelectString(),
 								null),
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Finished execution of " +
+						new JUnitEasyLoggerEntry(Level.INFO, "Finished execution of " +
 								insertAndGetID.getTransactionName(), null)
 				),
 				ListUtil.createList(
@@ -220,12 +221,12 @@ public class InsertAndGetIDTest extends DatabaseConnectionTest{
 		assertEquals(1, db.executeTransaction(insertAndGetID));
 		
 		// Verify some log entries
-		List<JUnitEasyLogger.JUnitEasyLoggerEntry> entries = logger.getEntries();
-		JUnitEasyLogger.assertEntries(
+		List<JUnitEasyLoggerEntry> entries = logger.getEntries();
+		JUnitEasyLoggerAssertEntries.assertEntries(
 				ListUtil.createList(
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Starting execution of " +
+						new JUnitEasyLoggerEntry(Level.INFO, "Starting execution of " +
 								insertAndGetID.getTransactionName(), null),
-						new JUnitEasyLogger.JUnitEasyLoggerEntry(Level.INFO, "Finished execution of " +
+						new JUnitEasyLoggerEntry(Level.INFO, "Finished execution of " +
 								insertAndGetID.getTransactionName(), null)
 				),
 				ListUtil.createList(

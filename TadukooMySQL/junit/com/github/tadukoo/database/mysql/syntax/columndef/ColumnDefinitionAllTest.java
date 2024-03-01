@@ -122,6 +122,17 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 		assertTrue(charDef.isPrimaryKey());
 	}
 	
+	@Test
+	public void testSetUnique(){
+		charDef = ColumnDefinition.builder()
+				.columnName(columnName)
+				.character()
+				.length(size)
+				.unique()
+				.build();
+		assertTrue(charDef.isUnique());
+	}
+	
 	/*
 	 * Default Fields
 	 */
@@ -166,6 +177,11 @@ public class ColumnDefinitionAllTest implements ColumnDefinitionConstants{
 	@Test
 	public void testDefaultPrimaryKey(){
 		assertFalse(charDef.isPrimaryKey());
+	}
+	
+	@Test
+	public void testDefaultUnique(){
+		assertFalse(charDef.isUnique());
 	}
 	
 	/*

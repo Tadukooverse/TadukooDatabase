@@ -294,7 +294,7 @@ public class DatabasePojoTest extends DatabaseConnectionTest{
 		assertFalse(columnDefs.isEmpty());
 		assertTrue(columnDefs.containsKey(idColName));
 		assertEquals(columnDef, columnDefs.get(idColName));
-		Set<String> columnDefKeys = pojo.getColumnDefKeys();
+		List<String> columnDefKeys = pojo.getColumnDefKeys();
 		assertFalse(columnDefKeys.isEmpty());
 		assertEquals(1, columnDefKeys.size());
 		assertEquals(idColName, columnDefKeys.iterator().next());
@@ -320,7 +320,7 @@ public class DatabasePojoTest extends DatabaseConnectionTest{
 		assertFalse(columnDefs.isEmpty());
 		assertTrue(columnDefs.containsKey(idColName));
 		assertEquals(columnDef, columnDefs.get(idColName));
-		Set<String> columnDefKeys = pojo.getColumnDefKeys();
+		List<String> columnDefKeys = pojo.getColumnDefKeys();
 		assertFalse(columnDefKeys.isEmpty());
 		assertEquals(1, columnDefKeys.size());
 		assertEquals(idColName, columnDefKeys.iterator().next());

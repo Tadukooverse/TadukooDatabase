@@ -74,6 +74,11 @@ public class ColumnDefinition{
 	 *         <td>Whether this column is the primary key or not</td>
 	 *         <td>Defaults to false</td>
 	 *     </tr>
+	 *     <tr>
+	 *         <td>unique</td>
+	 *         <td>Whether this column is unique or not</td>
+	 *         <td>Defaults to false</td>
+	 *     </tr>
 	 * </table>
 	 *
 	 * @author Logan Ferree (Tadukoo)
@@ -439,6 +444,8 @@ public class ColumnDefinition{
 		protected boolean autoIncrement = false;
 		/** Whether this column is the primary key or not */
 		protected boolean primaryKey = false;
+		/** Whether this column is unique or not */
+		protected boolean unique = false;
 		
 		/**
 		 * Creates a new Builder using the given parameters from the {@link ColumnDefinitionBuilder}
@@ -465,6 +472,13 @@ public class ColumnDefinition{
 		@Override
 		public NormalEnding primaryKey(){
 			this.primaryKey = true;
+			return this;
+		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NormalEnding unique(){
+			this.unique = true;
 			return this;
 		}
 		
@@ -557,7 +571,7 @@ public class ColumnDefinition{
 			checkForErrors();
 			
 			return new ColumnDefinition(columnName, dataType, size, values, digits, fractionalSecondsPrecision,
-					notNull, unsigned, autoIncrement, primaryKey);
+					notNull, unsigned, autoIncrement, primaryKey, unique);
 		}
 	}
 	
@@ -604,6 +618,12 @@ public class ColumnDefinition{
 		public NumericEnding primaryKey(){
 			return (NumericEnding) super.primaryKey();
 		}
+		
+		/** {@inheritDoc} */
+		@Override
+		public NumericEnding unique(){
+			return (NumericEnding) super.unique();
+		}
 	}
 	
 	/** The name to use for the column */
@@ -626,6 +646,8 @@ public class ColumnDefinition{
 	private final boolean autoIncrement;
 	/** Whether this column is the primary key or not */
 	private final boolean primaryKey;
+	/** Whether this column is unique or not */
+	private final boolean unique;
 	
 	/**
 	 * Constructs a new {@link ColumnDefinition} with the given parameters
@@ -640,11 +662,12 @@ public class ColumnDefinition{
 	 * @param unsigned Whether this column is unsigned (true) or signed (false)
 	 * @param autoIncrement Whether to auto-increment this column or not
 	 * @param primaryKey Whether this column is the primary key or not
+	 * @param unique Whether this column is unique or not
 	 */
 	private ColumnDefinition(
 			String columnName, SQLDataType dataType,
 			Long size, List<String> values, Integer digits, Integer fractionalSecondsPrecision,
-			boolean notNull, boolean unsigned, boolean autoIncrement, boolean primaryKey){
+			boolean notNull, boolean unsigned, boolean autoIncrement, boolean primaryKey, boolean unique){
 		this.columnName = columnName;
 		this.dataType = dataType;
 		this.size = size;
@@ -655,6 +678,7 @@ public class ColumnDefinition{
 		this.unsigned = unsigned;
 		this.autoIncrement = autoIncrement;
 		this.primaryKey = primaryKey;
+		this.unique = unique;
 	}
 	
 	/**
@@ -734,6 +758,13 @@ public class ColumnDefinition{
 		return primaryKey;
 	}
 	
+	/**
+	 * @return Whether this column is unique or not
+	 */
+	public boolean isUnique(){
+		return unique;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString(){
@@ -785,6 +816,11 @@ public class ColumnDefinition{
 		// Add primary key if we have it
 		if(primaryKey){
 			colDef.append(" PRIMARY KEY");
+		}
+		
+		// Add unique if we have it
+		if(unique){
+			colDef.append(" UNIQUE");
 		}
 		
 		return colDef.toString();
@@ -1159,6 +1195,12 @@ public class ColumnDefinition{
 		 * @return this, to continue building
 		 */
 		NormalEnding primaryKey();
+		
+		/**
+		 * Sets this column to be unique
+		 * @return this, to continue building
+		 */
+		NormalEnding unique();
 	}
 	
 	/**
@@ -1184,6 +1226,10 @@ public class ColumnDefinition{
 		/** {@inheritDoc} */
 		@Override
 		NumericEnding primaryKey();
+		
+		/** {@inheritDoc} */
+		@Override
+		NumericEnding unique();
 	}
 	
 	/**
