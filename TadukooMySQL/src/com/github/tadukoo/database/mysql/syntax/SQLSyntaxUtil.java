@@ -44,7 +44,7 @@ public class SQLSyntaxUtil{
 	 */
 	public static String convertValueToString(Object value){
 		if(value instanceof String s){
-			return "'" + s + "'";
+			return "'" + escapeString(s) + "'";
 		}else if(value instanceof Integer i){
 			return i.toString();
 		}else if(value instanceof Boolean b){
@@ -52,13 +52,18 @@ public class SQLSyntaxUtil{
 		}else if(value instanceof byte[] b){
 			return "0x" + ByteUtil.toHex(b);
 		}else{
-			String str = value.toString();
+			String str = escapeString(value.toString());
 			if(value instanceof Character ||
-					value instanceof Time || value instanceof Date || value instanceof Timestamp){
+					value instanceof Time || value instanceof Date || value instanceof Timestamp ||
+					value instanceof Enum<?>){
 				str = "'" + str + "'";
 			}
 			return str;
 		}
+	}
+	
+	public static String escapeString(String str){
+		return str.replace("'", "''");
 	}
 	
 	/**
